@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Dashboard as DashboardIcon,
   Inventory as InventoryIcon,
-  Precision as MachineryIcon,
+  Build as MachineryIcon,
   SwapHoriz as MovementsIcon,
   People as PeopleIcon,
   Analytics as AnalyticsIcon,

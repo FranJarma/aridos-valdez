@@ -21,7 +21,6 @@
     "vite": "^3.0.4"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.19.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^5.0.1",
