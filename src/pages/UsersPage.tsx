@@ -31,7 +31,7 @@ import {
   Alert,
   AlertIcon,
 } from '@chakra-ui/react';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { HiPlus, HiPencil } from 'react-icons/hi';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -155,7 +155,7 @@ export function UsersPage() {
     <Box>
       <HStack justify="space-between" mb={6}>
         <Heading color="aridos.primary">Gestión de Usuarios</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="brand" onClick={handleAdd}>
+        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={handleAdd}>
           Agregar Usuario
         </Button>
       </HStack>
@@ -204,7 +204,7 @@ export function UsersPage() {
                   <Td>
                     <Button
                       size="sm"
-                      leftIcon={<EditIcon />}
+                      leftIcon={<HiPencil />}
                       onClick={() => handleEdit(user)}
                     >
                       Editar

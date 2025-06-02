@@ -29,7 +29,7 @@ import {
   FormLabel,
   useToast,
 } from '@chakra-ui/react';
-import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { HiPlus, HiPencil, HiTrash } from 'react-icons/hi';
 import { useForm } from 'react-hook-form';
 
 interface Material {
@@ -135,7 +135,7 @@ export function MaterialsPage() {
     <Box>
       <HStack justify="space-between" mb={6}>
         <Heading color="aridos.primary">Gestión de Materiales</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="brand" onClick={handleAdd}>
+        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={handleAdd}>
           Agregar Material
         </Button>
       </HStack>
@@ -189,7 +189,7 @@ export function MaterialsPage() {
                       <HStack spacing={2}>
                         <Button
                           size="sm"
-                          leftIcon={<EditIcon />}
+                          leftIcon={<HiPencil />}
                           onClick={() => handleEdit(material)}
                         >
                           Editar

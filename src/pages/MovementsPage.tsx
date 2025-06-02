@@ -31,7 +31,7 @@ import {
   useToast,
   Text,
 } from '@chakra-ui/react';
-import { AddIcon } from '@chakra-ui/icons';
+import { HiPlus } from 'react-icons/hi';
 import { useForm } from 'react-hook-form';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -136,7 +136,7 @@ export function MovementsPage() {
     <Box>
       <HStack justify="space-between" mb={6}>
         <Heading color="aridos.primary">Movimientos de Materiales</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="brand" onClick={onOpen}>
+        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={onOpen}>
           Registrar Movimiento
         </Button>
       </HStack>

@@ -22,7 +22,7 @@ import {
   useDisclosure,
   Badge,
 } from '@chakra-ui/react';
-import { HamburgerIcon, BellIcon, SettingsIcon } from '@chakra-ui/icons';
+import { HiMenu, HiBell, HiCog } from 'react-icons/hi';
 import { useAuth } from '../contexts/AuthContext';
 import { useOffline } from '../contexts/OfflineContext';
 import { Sidebar } from './Sidebar';
@@ -56,7 +56,7 @@ export function Layout({ children }: LayoutProps) {
               onClick={onOpen}
               variant="outline"
               aria-label="open menu"
-              icon={<HamburgerIcon />}
+              icon={<HiMenu />}
             />
             <Text fontSize="xl" fontWeight="bold" color="aridos.primary">
               Áridos Valdez SRL
@@ -76,7 +76,7 @@ export function Layout({ children }: LayoutProps) {
           <HStack spacing={4}>
             <IconButton
               aria-label="Notificaciones"
-              icon={<BellIcon />}
+              icon={<HiBell />}
               variant="ghost"
             />
             <Menu>
@@ -98,7 +98,7 @@ export function Layout({ children }: LayoutProps) {
                     </Text>
                   </VStack>
                 </MenuItem>
-                <MenuItem icon={<SettingsIcon />}>
+                <MenuItem icon={<HiCog />}>
                   Configuración
                 </MenuItem>
                 <MenuItem onClick={signOut}>
