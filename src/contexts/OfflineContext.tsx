@@ -1,11 +1,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useToast } from '@chakra-ui/react';
+import { Alert, Snackbar } from '@mui/material';
 
 interface OfflineContextType {
   isOnline: boolean;
-  syncData: () => Promise<void>;
   pendingOperations: any[];
+  addPendingOperation: (operation: any) => void;
+  syncData: () => Promise<void>;
 }
 
 const OfflineContext = createContext<OfflineContextType | undefined>(undefined);
@@ -13,28 +14,30 @@ const OfflineContext = createContext<OfflineContextType | undefined>(undefined);
 export function OfflineProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingOperations, setPendingOperations] = useState<any[]>([]);
-  const toast = useToast();
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'warning' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showSnackbar = (message: string, severity: 'success' | 'warning' | 'error') => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      toast({
-        title: 'Conexión restaurada',
-        description: 'Sincronizando datos...',
-        status: 'success',
-        duration: 3000,
-      });
+      showSnackbar('Conexión restaurada. Sincronizando datos...', 'success');
       syncData();
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      toast({
-        title: 'Sin conexión',
-        description: 'Trabajando en modo offline',
-        status: 'warning',
-        duration: 3000,
-      });
+      showSnackbar('Sin conexión. Trabajando en modo offline', 'warning');
     };
 
     window.addEventListener('online', handleOnline);
@@ -46,38 +49,52 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const addPendingOperation = (operation: any) => {
+    setPendingOperations(prev => [...prev, { ...operation, timestamp: Date.now() }]);
+  };
+
   const syncData = async () => {
     if (!isOnline || pendingOperations.length === 0) return;
 
     try {
-      // Aquí implementarías la lógica de sincronización
-      // Por ahora solo limpiamos las operaciones pendientes
-      setPendingOperations([]);
+      // Simulate sync process
+      console.log('Syncing pending operations:', pendingOperations);
       
-      toast({
-        title: 'Sincronización completa',
-        description: 'Todos los datos han sido sincronizados',
-        status: 'success',
-        duration: 2000,
-      });
+      // Here you would sync with Supabase
+      // await supabase.from('table').insert(pendingOperations);
+      
+      setPendingOperations([]);
+      showSnackbar('Datos sincronizados correctamente', 'success');
     } catch (error) {
       console.error('Error syncing data:', error);
-      toast({
-        title: 'Error de sincronización',
-        description: 'No se pudieron sincronizar algunos datos',
-        status: 'error',
-        duration: 3000,
-      });
+      showSnackbar('Error al sincronizar datos', 'error');
     }
   };
 
+  const contextValue: OfflineContextType = {
+    isOnline,
+    pendingOperations,
+    addPendingOperation,
+    syncData,
+  };
+
   return (
-    <OfflineContext.Provider value={{
-      isOnline,
-      syncData,
-      pendingOperations,
-    }}>
+    <OfflineContext.Provider value={contextValue}>
       {children}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </OfflineContext.Provider>
   );
 }
