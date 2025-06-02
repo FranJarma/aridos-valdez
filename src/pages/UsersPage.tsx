@@ -2,36 +2,32 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Heading,
+  Typography,
   Button,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Badge,
-  HStack,
-  VStack,
-  Input,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  Stack,
+  TextField,
   Select,
-  Card,
-  CardBody,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  MenuItem,
   FormControl,
-  FormLabel,
-  useToast,
+  InputLabel,
+  Card,
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Grid,
   Alert,
-  AlertIcon,
-} from '@chakra-ui/react';
-import { HiPlus, HiPencil } from 'react-icons/hi';
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -63,10 +59,10 @@ const mockUsers: User[] = [
 export function UsersPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [filter, setFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [open, setOpen] = useState(false);
   const { hasPermission } = useAuth();
-  const toast = useToast();
 
   const {
     register,
@@ -79,8 +75,7 @@ export function UsersPage() {
   if (!hasPermission('manage_users')) {
     return (
       <Box>
-        <Alert status="error">
-          <AlertIcon />
+        <Alert severity="error">
           No tienes permisos para acceder a esta sección.
         </Alert>
       </Box>
@@ -88,8 +83,9 @@ export function UsersPage() {
   }
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(filter.toLowerCase()) ||
-    user.email.toLowerCase().includes(filter.toLowerCase())
+    (user.name.toLowerCase().includes(filter.toLowerCase()) ||
+    user.email.toLowerCase().includes(filter.toLowerCase())) &&
+    (roleFilter === '' || user.role === roleFilter)
   );
 
   const handleEdit = (user: User) => {
@@ -97,13 +93,13 @@ export function UsersPage() {
     setValue('name', user.name);
     setValue('email', user.email);
     setValue('role', user.role);
-    onOpen();
+    setOpen(true);
   };
 
   const handleAdd = () => {
     setEditingUser(null);
     reset();
-    onOpen();
+    setOpen(true);
   };
 
   const onSubmit = (data: User) => {
@@ -111,11 +107,6 @@ export function UsersPage() {
       setUsers(prev => prev.map(u => 
         u.id === editingUser.id ? { ...data, id: editingUser.id, createdAt: editingUser.createdAt } : u
       ));
-      toast({
-        title: 'Usuario actualizado',
-        status: 'success',
-        duration: 2000,
-      });
     } else {
       const newUser = { 
         ...data, 
@@ -123,22 +114,17 @@ export function UsersPage() {
         createdAt: new Date().toISOString().split('T')[0]
       };
       setUsers(prev => [...prev, newUser]);
-      toast({
-        title: 'Usuario agregado',
-        status: 'success',
-        duration: 2000,
-      });
     }
-    onClose();
+    setOpen(false);
     reset();
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'purple';
-      case 'operator': return 'blue';
-      case 'viewer': return 'green';
-      default: return 'gray';
+      case 'admin': return 'secondary';
+      case 'operator': return 'primary';
+      case 'viewer': return 'success';
+      default: return 'default';
     }
   };
 
@@ -153,123 +139,146 @@ export function UsersPage() {
 
   return (
     <Box>
-      <HStack justify="space-between" mb={6}>
-        <Heading color="aridos.primary">Gestión de Usuarios</Heading>
-        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={handleAdd}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" color="primary">
+          Gestión de Usuarios
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
           Agregar Usuario
         </Button>
-      </HStack>
+      </Stack>
 
-      <Card mb={6}>
-        <CardBody>
-          <HStack spacing={4}>
-            <Input
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
               placeholder="Buscar usuarios..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              maxW="300px"
+              sx={{ minWidth: 300 }}
+              size="small"
             />
-            <Select placeholder="Filtrar por rol" maxW="200px">
-              <option value="admin">Administrador</option>
-              <option value="operator">Operador</option>
-              <option value="viewer">Visualizador</option>
-            </Select>
-          </HStack>
-        </CardBody>
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel>Filtrar por rol</InputLabel>
+              <Select
+                value={roleFilter}
+                label="Filtrar por rol"
+                onChange={(e) => setRoleFilter(e.target.value)}
+              >
+                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="admin">Administrador</MenuItem>
+                <MenuItem value="operator">Operador</MenuItem>
+                <MenuItem value="viewer">Visualizador</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </CardContent>
       </Card>
 
-      <Card>
-        <CardBody>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Nombre</Th>
-                <Th>Email</Th>
-                <Th>Rol</Th>
-                <Th>Fecha Creación</Th>
-                <Th>Acciones</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filteredUsers.map((user) => (
-                <Tr key={user.id}>
-                  <Td fontWeight="medium">{user.name}</Td>
-                  <Td>{user.email}</Td>
-                  <Td>
-                    <Badge colorScheme={getRoleColor(user.role)}>
-                      {getRoleLabel(user.role)}
-                    </Badge>
-                  </Td>
-                  <Td>{user.createdAt}</Td>
-                  <Td>
-                    <Button
-                      size="sm"
-                      leftIcon={<HiPencil />}
-                      onClick={() => handleEdit(user)}
-                    >
-                      Editar
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </CardBody>
-      </Card>
-
-      {/* Modal for Add/Edit User */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {editingUser ? 'Editar Usuario' : 'Agregar Usuario'}
-          </ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
-              <VStack spacing={4}>
-                <FormControl isInvalid={!!errors.name}>
-                  <FormLabel>Nombre Completo</FormLabel>
-                  <Input {...register('name', { required: 'Nombre requerido' })} />
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.email}>
-                  <FormLabel>Email</FormLabel>
-                  <Input
-                    type="email"
-                    {...register('email', {
-                      required: 'Email requerido',
-                      pattern: {
-                        value: /^\S+@\S+$/i,
-                        message: 'Email inválido',
-                      },
-                    })}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Rol</TableCell>
+              <TableCell>Fecha Creación</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell sx={{ fontWeight: 'medium' }}>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <Chip 
+                    color={getRoleColor(user.role) as any} 
+                    label={getRoleLabel(user.role)} 
+                    size="small" 
                   />
-                </FormControl>
+                </TableCell>
+                <TableCell>{user.createdAt}</TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    startIcon={<EditIcon />}
+                    onClick={() => handleEdit(user)}
+                  >
+                    Editar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-                <FormControl isInvalid={!!errors.role}>
-                  <FormLabel>Rol</FormLabel>
-                  <Select {...register('role', { required: 'Rol requerido' })}>
-                    <option value="">Seleccionar rol</option>
-                    <option value="admin">Administrador</option>
-                    <option value="operator">Operador</option>
-                    <option value="viewer">Visualizador</option>
+      {/* Dialog for Add/Edit User */}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {editingUser ? 'Editar Usuario' : 'Agregar Usuario'}
+        </DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('name', { required: 'Nombre requerido' })}
+                  label="Nombre Completo"
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  {...register('email', {
+                    required: 'Email requerido',
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: 'Email inválido',
+                    },
+                  })}
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormControl fullWidth error={!!errors.role}>
+                  <InputLabel>Rol</InputLabel>
+                  <Select
+                    {...register('role', { required: 'Rol requerido' })}
+                    label="Rol"
+                  >
+                    <MenuItem value="admin">Administrador</MenuItem>
+                    <MenuItem value="operator">Operador</MenuItem>
+                    <MenuItem value="viewer">Visualizador</MenuItem>
                   </Select>
                 </FormControl>
-              </VStack>
-            </ModalBody>
+              </Grid>
+            </Grid>
+          </DialogContent>
 
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button type="submit" colorScheme="brand">
-                {editingUser ? 'Actualizar' : 'Agregar'}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained">
+              {editingUser ? 'Actualizar' : 'Agregar'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </Box>
   );
 }

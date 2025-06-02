@@ -3,23 +3,25 @@ import React from 'react';
 import {
   Box,
   Grid,
-  GridItem,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
   Card,
-  CardBody,
-  Heading,
-  VStack,
-  HStack,
-  Text,
-  Progress,
-  Badge,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+  CardContent,
+  Typography,
+  LinearProgress,
+  Chip,
+  Stack,
+  Paper,
+} from '@mui/material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts';
 
 const mockData = {
   dailyProduction: [
@@ -40,120 +42,146 @@ const mockData = {
 };
 
 export function DashboardPage() {
-  const cardBg = useColorModeValue('white', 'gray.800');
+  const getStockStatus = (stock: number, min: number) => {
+    const percentage = (stock / (min * 2)) * 100;
+    if (percentage <= 50) return { color: 'error', label: 'Crítico' };
+    if (percentage <= 75) return { color: 'warning', label: 'Bajo' };
+    return { color: 'success', label: 'Normal' };
+  };
 
   return (
     <Box>
-      <Heading mb={6} color="aridos.primary">
+      <Typography variant="h4" gutterBottom color="primary">
         Dashboard - Planta de Áridos
-      </Heading>
+      </Typography>
 
-      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={6} mb={8}>
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Producción Diaria</StatLabel>
-                <StatNumber color="aridos.primary">1,245 Ton</StatNumber>
-                <StatHelpText>
-                  <StatArrow type="increase" />
-                  23.36%
-                </StatHelpText>
-              </Stat>
-            </CardBody>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Producción Diaria
+              </Typography>
+              <Typography variant="h4" color="primary">
+                1,245 Ton
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                +23.36% ↗
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Maquinaria Activa</StatLabel>
-                <StatNumber color="green.500">8/10</StatNumber>
-                <StatHelpText>2 en mantenimiento</StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Eficiencia Promedio
+              </Typography>
+              <Typography variant="h4" color="primary">
+                87.2%
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                +2.1% ↗
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Movimientos Hoy</StatLabel>
-                <StatNumber color="blue.500">45</StatNumber>
-                <StatHelpText>
-                  <StatArrow type="increase" />
-                  12%
-                </StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Máquinas Activas
+              </Typography>
+              <Typography variant="h4" color="primary">
+                8/12
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                4 en mantenimiento
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Eficiencia</StatLabel>
-                <StatNumber color="purple.500">87%</StatNumber>
-                <StatHelpText>
-                  <StatArrow type="increase" />
-                  5% esta semana
-                </StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Stock Bajo
+              </Typography>
+              <Typography variant="h4" color="warning.main">
+                3
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                materiales críticos
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
       </Grid>
 
-      <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={6}>
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Heading size="md" mb={4}>Producción Semanal</Heading>
-              <Box h="300px">
+      <Grid container spacing={3}>
+        <Grid item xs={12} lg={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Producción Semanal
+              </Typography>
+              <Box sx={{ height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={mockData.dailyProduction}>
+                  <BarChart data={mockData.dailyProduction}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#8B4513" strokeWidth={2} />
-                  </LineChart>
+                    <Bar dataKey="value" fill="#8B4513" />
+                  </BarChart>
                 </ResponsiveContainer>
               </Box>
-            </CardBody>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Heading size="md" mb={4}>Estado de Stock</Heading>
-              <VStack spacing={4}>
-                {mockData.materialStock.map((item) => (
-                  <Box key={item.material} w="full">
-                    <HStack justify="space-between" mb={2}>
-                      <Text fontWeight="medium">{item.material}</Text>
-                      <Badge
-                        colorScheme={item.stock > item.min * 2 ? 'green' : item.stock > item.min ? 'yellow' : 'red'}
-                      >
-                        {item.stock}%
-                      </Badge>
-                    </HStack>
-                    <Progress
-                      value={item.stock}
-                      colorScheme={item.stock > item.min * 2 ? 'green' : item.stock > item.min ? 'yellow' : 'red'}
-                      size="sm"
-                      borderRadius="md"
-                    />
-                  </Box>
-                ))}
-              </VStack>
-            </CardBody>
+        <Grid item xs={12} lg={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Estado de Stock
+              </Typography>
+              <Stack spacing={2}>
+                {mockData.materialStock.map((item) => {
+                  const status = getStockStatus(item.stock, item.min);
+                  const percentage = Math.min((item.stock / (item.min * 2)) * 100, 100);
+                  
+                  return (
+                    <Box key={item.material}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="body2" fontWeight="medium">
+                          {item.material}
+                        </Typography>
+                        <Chip 
+                          label={status.label} 
+                          color={status.color as any}
+                          size="small" 
+                        />
+                      </Box>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={percentage}
+                        color={status.color as any}
+                        sx={{ height: 8, borderRadius: 1 }}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {item.stock} / {item.min * 2} unidades
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
       </Grid>
     </Box>
   );

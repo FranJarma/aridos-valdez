@@ -2,34 +2,31 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Heading,
+  Typography,
   Button,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Badge,
-  HStack,
-  VStack,
-  Input,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  Stack,
+  TextField,
   Select,
-  Card,
-  CardBody,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  MenuItem,
   FormControl,
-  FormLabel,
-  useToast,
-} from '@chakra-ui/react';
-import { HiPlus, HiPencil } from 'react-icons/hi';
+  InputLabel,
+  Card,
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Grid,
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 
 interface Machinery {
@@ -63,9 +60,9 @@ const mockMachinery: Machinery[] = [
 export function MachineryPage() {
   const [machinery, setMachinery] = useState<Machinery[]>(mockMachinery);
   const [filter, setFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [editingMachine, setEditingMachine] = useState<Machinery | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
+  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -76,8 +73,9 @@ export function MachineryPage() {
   } = useForm<Machinery>();
 
   const filteredMachinery = machinery.filter(machine =>
-    machine.name.toLowerCase().includes(filter.toLowerCase()) ||
-    machine.type.toLowerCase().includes(filter.toLowerCase())
+    (machine.name.toLowerCase().includes(filter.toLowerCase()) ||
+    machine.type.toLowerCase().includes(filter.toLowerCase())) &&
+    (statusFilter === '' || machine.status === statusFilter)
   );
 
   const handleEdit = (machine: Machinery) => {
@@ -87,13 +85,13 @@ export function MachineryPage() {
     setValue('model', machine.model);
     setValue('status', machine.status);
     setValue('location', machine.location);
-    onOpen();
+    setOpen(true);
   };
 
   const handleAdd = () => {
     setEditingMachine(null);
     reset();
-    onOpen();
+    setOpen(true);
   };
 
   const onSubmit = (data: Machinery) => {
@@ -101,30 +99,20 @@ export function MachineryPage() {
       setMachinery(prev => prev.map(m => 
         m.id === editingMachine.id ? { ...data, id: editingMachine.id } : m
       ));
-      toast({
-        title: 'Maquinaria actualizada',
-        status: 'success',
-        duration: 2000,
-      });
     } else {
       const newMachine = { ...data, id: Date.now().toString() };
       setMachinery(prev => [...prev, newMachine]);
-      toast({
-        title: 'Maquinaria agregada',
-        status: 'success',
-        duration: 2000,
-      });
     }
-    onClose();
+    setOpen(false);
     reset();
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'green';
-      case 'maintenance': return 'yellow';
-      case 'inactive': return 'red';
-      default: return 'gray';
+      case 'active': return 'success';
+      case 'maintenance': return 'warning';
+      case 'inactive': return 'error';
+      default: return 'default';
     }
   };
 
@@ -139,133 +127,167 @@ export function MachineryPage() {
 
   return (
     <Box>
-      <HStack justify="space-between" mb={6}>
-        <Heading color="aridos.primary">Gestión de Maquinaria</Heading>
-        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={handleAdd}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" color="primary">
+          Gestión de Maquinaria
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
           Agregar Maquinaria
         </Button>
-      </HStack>
+      </Stack>
 
-      <Card mb={6}>
-        <CardBody>
-          <HStack spacing={4}>
-            <Input
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
               placeholder="Buscar maquinaria..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              maxW="300px"
+              sx={{ minWidth: 300 }}
+              size="small"
             />
-            <Select placeholder="Filtrar por estado" maxW="200px">
-              <option value="active">Activa</option>
-              <option value="maintenance">Mantenimiento</option>
-              <option value="inactive">Inactiva</option>
-            </Select>
-          </HStack>
-        </CardBody>
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel>Filtrar por estado</InputLabel>
+              <Select
+                value={statusFilter}
+                label="Filtrar por estado"
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="active">Activa</MenuItem>
+                <MenuItem value="maintenance">Mantenimiento</MenuItem>
+                <MenuItem value="inactive">Inactiva</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </CardContent>
       </Card>
 
-      <Card>
-        <CardBody>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Nombre</Th>
-                <Th>Tipo</Th>
-                <Th>Modelo</Th>
-                <Th>Estado</Th>
-                <Th>Ubicación</Th>
-                <Th>Acciones</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filteredMachinery.map((machine) => (
-                <Tr key={machine.id}>
-                  <Td fontWeight="medium">{machine.name}</Td>
-                  <Td>{machine.type}</Td>
-                  <Td>{machine.model}</Td>
-                  <Td>
-                    <Badge colorScheme={getStatusColor(machine.status)}>
-                      {getStatusLabel(machine.status)}
-                    </Badge>
-                  </Td>
-                  <Td>{machine.location}</Td>
-                  <Td>
-                    <Button
-                      size="sm"
-                      leftIcon={<HiPencil />}
-                      onClick={() => handleEdit(machine)}
-                    >
-                      Editar
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </CardBody>
-      </Card>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Modelo</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Ubicación</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredMachinery.map((machine) => (
+              <TableRow key={machine.id}>
+                <TableCell sx={{ fontWeight: 'medium' }}>{machine.name}</TableCell>
+                <TableCell>{machine.type}</TableCell>
+                <TableCell>{machine.model}</TableCell>
+                <TableCell>
+                  <Chip 
+                    color={getStatusColor(machine.status) as any} 
+                    label={getStatusLabel(machine.status)} 
+                    size="small" 
+                  />
+                </TableCell>
+                <TableCell>{machine.location}</TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    startIcon={<EditIcon />}
+                    onClick={() => handleEdit(machine)}
+                  >
+                    Editar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Modal for Add/Edit Machinery */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {editingMachine ? 'Editar Maquinaria' : 'Agregar Maquinaria'}
-          </ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
-              <VStack spacing={4}>
-                <FormControl isInvalid={!!errors.name}>
-                  <FormLabel>Nombre</FormLabel>
-                  <Input {...register('name', { required: 'Nombre requerido' })} />
-                </FormControl>
+      {/* Dialog for Add/Edit Machinery */}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {editingMachine ? 'Editar Maquinaria' : 'Agregar Maquinaria'}
+        </DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('name', { required: 'Nombre requerido' })}
+                  label="Nombre"
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              </Grid>
 
-                <FormControl isInvalid={!!errors.type}>
-                  <FormLabel>Tipo</FormLabel>
-                  <Select {...register('type', { required: 'Tipo requerido' })}>
-                    <option value="">Seleccionar tipo</option>
-                    <option value="Excavadora">Excavadora</option>
-                    <option value="Cargadora">Cargadora</option>
-                    <option value="Volquete">Volquete</option>
-                    <option value="Trituradora">Trituradora</option>
-                    <option value="Cinta transportadora">Cinta transportadora</option>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth error={!!errors.type}>
+                  <InputLabel>Tipo</InputLabel>
+                  <Select
+                    {...register('type', { required: 'Tipo requerido' })}
+                    label="Tipo"
+                  >
+                    <MenuItem value="Excavadora">Excavadora</MenuItem>
+                    <MenuItem value="Cargadora">Cargadora</MenuItem>
+                    <MenuItem value="Volquete">Volquete</MenuItem>
+                    <MenuItem value="Trituradora">Trituradora</MenuItem>
+                    <MenuItem value="Cinta transportadora">Cinta transportadora</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
 
-                <FormControl isInvalid={!!errors.model}>
-                  <FormLabel>Modelo</FormLabel>
-                  <Input {...register('model', { required: 'Modelo requerido' })} />
-                </FormControl>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('model', { required: 'Modelo requerido' })}
+                  label="Modelo"
+                  fullWidth
+                  error={!!errors.model}
+                  helperText={errors.model?.message}
+                />
+              </Grid>
 
-                <FormControl isInvalid={!!errors.status}>
-                  <FormLabel>Estado</FormLabel>
-                  <Select {...register('status', { required: 'Estado requerido' })}>
-                    <option value="">Seleccionar estado</option>
-                    <option value="active">Activa</option>
-                    <option value="maintenance">Mantenimiento</option>
-                    <option value="inactive">Inactiva</option>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth error={!!errors.status}>
+                  <InputLabel>Estado</InputLabel>
+                  <Select
+                    {...register('status', { required: 'Estado requerido' })}
+                    label="Estado"
+                  >
+                    <MenuItem value="active">Activa</MenuItem>
+                    <MenuItem value="maintenance">Mantenimiento</MenuItem>
+                    <MenuItem value="inactive">Inactiva</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
 
-                <FormControl isInvalid={!!errors.location}>
-                  <FormLabel>Ubicación</FormLabel>
-                  <Input {...register('location', { required: 'Ubicación requerida' })} />
-                </FormControl>
-              </VStack>
-            </ModalBody>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('location', { required: 'Ubicación requerida' })}
+                  label="Ubicación"
+                  fullWidth
+                  error={!!errors.location}
+                  helperText={errors.location?.message}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
 
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button type="submit" colorScheme="brand">
-                {editingMachine ? 'Actualizar' : 'Agregar'}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained">
+              {editingMachine ? 'Actualizar' : 'Agregar'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </Box>
   );
 }

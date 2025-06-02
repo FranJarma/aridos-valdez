@@ -1,15 +1,24 @@
 
 import React from 'react';
-import { VStack, HStack, Text, Icon, Box } from '@chakra-ui/react';
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  Box,
+} from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  MdDashboard,
-  MdInventory,
-  MdPrecisionManufacturing,
-  MdSwapHoriz,
-  MdPeople,
-  MdAnalytics,
-} from 'react-icons/md';
+  Dashboard as DashboardIcon,
+  Inventory as InventoryIcon,
+  Precision as MachineryIcon,
+  SwapHoriz as MovementsIcon,
+  People as PeopleIcon,
+  Analytics as AnalyticsIcon,
+} from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarProps {
@@ -19,45 +28,45 @@ interface SidebarProps {
 const menuItems = [
   {
     label: 'Dashboard',
-    icon: MdDashboard,
     path: '/dashboard',
-    permission: 'read',
+    icon: DashboardIcon,
+    permission: null,
   },
   {
     label: 'Materiales',
-    icon: MdInventory,
     path: '/materials',
-    permission: 'read',
+    icon: InventoryIcon,
+    permission: 'view_materials',
   },
   {
     label: 'Maquinaria',
-    icon: MdPrecisionManufacturing,
     path: '/machinery',
-    permission: 'read',
+    icon: MachineryIcon,
+    permission: 'view_machinery',
   },
   {
     label: 'Movimientos',
-    icon: MdSwapHoriz,
     path: '/movements',
-    permission: 'read',
+    icon: MovementsIcon,
+    permission: 'view_movements',
   },
   {
     label: 'Usuarios',
-    icon: MdPeople,
     path: '/users',
+    icon: PeopleIcon,
     permission: 'manage_users',
   },
   {
     label: 'Reportes',
-    icon: MdAnalytics,
     path: '/reports',
+    icon: AnalyticsIcon,
     permission: 'view_reports',
   },
 ];
 
 export function Sidebar({ onItemClick }: SidebarProps) {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
   const handleNavigation = (path: string) => {
@@ -66,36 +75,49 @@ export function Sidebar({ onItemClick }: SidebarProps) {
   };
 
   return (
-    <VStack spacing={2} align="stretch" p={4}>
-      {menuItems.map((item) => {
-        if (!hasPermission(item.permission)) return null;
+    <Box>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main' }}>
+          Menú
+        </Typography>
+      </Toolbar>
+      
+      <List>
+        {menuItems.map((item) => {
+          if (item.permission && !hasPermission(item.permission)) {
+            return null;
+          }
 
-        const isActive = location.pathname === item.path;
-        
-        return (
-          <Box
-            key={item.path}
-            onClick={() => handleNavigation(item.path)}
-            cursor="pointer"
-            bg={isActive ? 'aridos.primary' : 'transparent'}
-            color={isActive ? 'white' : 'gray.700'}
-            px={4}
-            py={3}
-            borderRadius="md"
-            _hover={{
-              bg: isActive ? 'aridos.primary' : 'gray.100',
-            }}
-            transition="all 0.2s"
-          >
-            <HStack spacing={3}>
-              <Icon as={item.icon} boxSize={5} />
-              <Text fontWeight={isActive ? 'bold' : 'normal'}>
-                {item.label}
-              </Text>
-            </HStack>
-          </Box>
-        );
-      })}
-    </VStack>
+          const isActive = location.pathname === item.path;
+          const IconComponent = item.icon;
+
+          return (
+            <ListItem key={item.path} disablePadding>
+              <ListItemButton
+                selected={isActive}
+                onClick={() => handleNavigation(item.path)}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: 'primary.contrastText',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  <IconComponent />
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+      </List>
+    </Box>
   );
 }

@@ -1,48 +1,75 @@
 
-import { extendTheme } from '@chakra-ui/react';
+import { createTheme } from '@mui/material/styles';
 
-export const theme = extendTheme({
-  config: {
-    initialColorMode: 'light',
-    useSystemColorMode: false,
-  },
-  colors: {
-    brand: {
-      50: '#e3f2fd',
-      100: '#bbdefb',
-      200: '#90caf9',
-      300: '#64b5f6',
-      400: '#42a5f5',
-      500: '#2196f3',
-      600: '#1e88e5',
-      700: '#1976d2',
-      800: '#1565c0',
-      900: '#0d47a1',
-    },
-    aridos: {
-      primary: '#8B4513',
-      secondary: '#D2691E',
-      accent: '#CD853F',
-      light: '#F5DEB3',
+export const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#8B4513',
+      light: '#CD853F',
       dark: '#654321',
-    }
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      main: '#D2691E',
+      light: '#F5DEB3',
+      dark: '#8B4513',
+      contrastText: '#ffffff',
+    },
+    background: {
+      default: '#fafafa',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#333333',
+      secondary: '#666666',
+    },
   },
-  fonts: {
-    heading: 'Inter, system-ui, sans-serif',
-    body: 'Inter, system-ui, sans-serif',
-  },
-  styles: {
-    global: {
-      body: {
-        bg: 'gray.50',
-        color: 'gray.800',
-      },
+  typography: {
+    fontFamily: 'Inter, system-ui, sans-serif',
+    h1: {
+      fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 600,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 600,
+    },
+    h6: {
+      fontWeight: 600,
     },
   },
   components: {
-    Button: {
+    MuiButton: {
       defaultProps: {
-        colorScheme: 'brand',
+        variant: 'contained',
+      },
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        size: 'small',
       },
     },
   },

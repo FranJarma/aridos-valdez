@@ -2,34 +2,31 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Heading,
+  Typography,
   Button,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Badge,
-  HStack,
-  VStack,
-  Input,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  Stack,
+  TextField,
   Select,
-  Card,
-  CardBody,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  MenuItem,
   FormControl,
-  FormLabel,
-  useToast,
-} from '@chakra-ui/react';
-import { HiPlus, HiPencil, HiTrash } from 'react-icons/hi';
+  InputLabel,
+  Card,
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Grid,
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 
 interface Material {
@@ -66,9 +63,9 @@ const mockMaterials: Material[] = [
 export function MaterialsPage() {
   const [materials, setMaterials] = useState<Material[]>(mockMaterials);
   const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
+  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -79,8 +76,9 @@ export function MaterialsPage() {
   } = useForm<Material>();
 
   const filteredMaterials = materials.filter(material =>
-    material.name.toLowerCase().includes(filter.toLowerCase()) ||
-    material.type.toLowerCase().includes(filter.toLowerCase())
+    (material.name.toLowerCase().includes(filter.toLowerCase()) ||
+    material.type.toLowerCase().includes(filter.toLowerCase())) &&
+    (typeFilter === '' || material.type === typeFilter)
   );
 
   const handleEdit = (material: Material) => {
@@ -91,195 +89,214 @@ export function MaterialsPage() {
     setValue('currentStock', material.currentStock);
     setValue('minStock', material.minStock);
     setValue('location', material.location);
-    onOpen();
+    setOpen(true);
   };
 
   const handleAdd = () => {
     setEditingMaterial(null);
     reset();
-    onOpen();
+    setOpen(true);
   };
 
   const onSubmit = (data: Material) => {
     if (editingMaterial) {
-      // Update existing material
       setMaterials(prev => prev.map(m => 
         m.id === editingMaterial.id ? { ...data, id: editingMaterial.id } : m
       ));
-      toast({
-        title: 'Material actualizado',
-        status: 'success',
-        duration: 2000,
-      });
     } else {
-      // Add new material
       const newMaterial = { ...data, id: Date.now().toString() };
       setMaterials(prev => [...prev, newMaterial]);
-      toast({
-        title: 'Material agregado',
-        status: 'success',
-        duration: 2000,
-      });
     }
-    onClose();
+    setOpen(false);
     reset();
   };
 
   const getStockStatus = (current: number, min: number) => {
-    if (current <= min) return { color: 'red', label: 'Crítico' };
-    if (current <= min * 1.5) return { color: 'yellow', label: 'Bajo' };
-    return { color: 'green', label: 'Normal' };
+    if (current <= min) return { color: 'error', label: 'Crítico' };
+    if (current <= min * 1.5) return { color: 'warning', label: 'Bajo' };
+    return { color: 'success', label: 'Normal' };
   };
 
   return (
     <Box>
-      <HStack justify="space-between" mb={6}>
-        <Heading color="aridos.primary">Gestión de Materiales</Heading>
-        <Button leftIcon={<HiPlus />} colorScheme="brand" onClick={handleAdd}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" color="primary">
+          Gestión de Materiales
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
           Agregar Material
         </Button>
-      </HStack>
+      </Stack>
 
-      <Card mb={6}>
-        <CardBody>
-          <HStack spacing={4}>
-            <Input
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
               placeholder="Buscar materiales..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              maxW="300px"
+              sx={{ minWidth: 300 }}
+              size="small"
             />
-            <Select placeholder="Filtrar por tipo" maxW="200px">
-              <option value="agregado">Agregado</option>
-              <option value="cemento">Cemento</option>
-              <option value="aditivo">Aditivo</option>
-            </Select>
-          </HStack>
-        </CardBody>
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel>Filtrar por tipo</InputLabel>
+              <Select
+                value={typeFilter}
+                label="Filtrar por tipo"
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
+                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="Agregado">Agregado</MenuItem>
+                <MenuItem value="Cemento">Cemento</MenuItem>
+                <MenuItem value="Aditivo">Aditivo</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </CardContent>
       </Card>
 
-      <Card>
-        <CardBody>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Material</Th>
-                <Th>Tipo</Th>
-                <Th>Stock Actual</Th>
-                <Th>Stock Mínimo</Th>
-                <Th>Estado</Th>
-                <Th>Ubicación</Th>
-                <Th>Acciones</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {filteredMaterials.map((material) => {
-                const status = getStockStatus(material.currentStock, material.minStock);
-                return (
-                  <Tr key={material.id}>
-                    <Td fontWeight="medium">{material.name}</Td>
-                    <Td>{material.type}</Td>
-                    <Td>{material.currentStock} {material.unit}</Td>
-                    <Td>{material.minStock} {material.unit}</Td>
-                    <Td>
-                      <Badge colorScheme={status.color}>{status.label}</Badge>
-                    </Td>
-                    <Td>{material.location}</Td>
-                    <Td>
-                      <HStack spacing={2}>
-                        <Button
-                          size="sm"
-                          leftIcon={<HiPencil />}
-                          onClick={() => handleEdit(material)}
-                        >
-                          Editar
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </CardBody>
-      </Card>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Material</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Stock Actual</TableCell>
+              <TableCell>Stock Mínimo</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Ubicación</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredMaterials.map((material) => {
+              const status = getStockStatus(material.currentStock, material.minStock);
+              return (
+                <TableRow key={material.id}>
+                  <TableCell sx={{ fontWeight: 'medium' }}>{material.name}</TableCell>
+                  <TableCell>{material.type}</TableCell>
+                  <TableCell>{material.currentStock} {material.unit}</TableCell>
+                  <TableCell>{material.minStock} {material.unit}</TableCell>
+                  <TableCell>
+                    <Chip color={status.color as any} label={status.label} size="small" />
+                  </TableCell>
+                  <TableCell>{material.location}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleEdit(material)}
+                    >
+                      Editar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Modal for Add/Edit Material */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {editingMaterial ? 'Editar Material' : 'Agregar Material'}
-          </ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
-              <VStack spacing={4}>
-                <FormControl isInvalid={!!errors.name}>
-                  <FormLabel>Nombre</FormLabel>
-                  <Input {...register('name', { required: 'Nombre requerido' })} />
-                </FormControl>
+      {/* Dialog for Add/Edit Material */}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {editingMaterial ? 'Editar Material' : 'Agregar Material'}
+        </DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('name', { required: 'Nombre requerido' })}
+                  label="Nombre"
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              </Grid>
 
-                <FormControl isInvalid={!!errors.type}>
-                  <FormLabel>Tipo</FormLabel>
-                  <Select {...register('type', { required: 'Tipo requerido' })}>
-                    <option value="">Seleccionar tipo</option>
-                    <option value="Agregado">Agregado</option>
-                    <option value="Cemento">Cemento</option>
-                    <option value="Aditivo">Aditivo</option>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth error={!!errors.type}>
+                  <InputLabel>Tipo</InputLabel>
+                  <Select
+                    {...register('type', { required: 'Tipo requerido' })}
+                    label="Tipo"
+                  >
+                    <MenuItem value="Agregado">Agregado</MenuItem>
+                    <MenuItem value="Cemento">Cemento</MenuItem>
+                    <MenuItem value="Aditivo">Aditivo</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
 
-                <FormControl isInvalid={!!errors.unit}>
-                  <FormLabel>Unidad</FormLabel>
-                  <Select {...register('unit', { required: 'Unidad requerida' })}>
-                    <option value="">Seleccionar unidad</option>
-                    <option value="Toneladas">Toneladas</option>
-                    <option value="Metros cúbicos">Metros cúbicos</option>
-                    <option value="Bolsas">Bolsas</option>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth error={!!errors.unit}>
+                  <InputLabel>Unidad</InputLabel>
+                  <Select
+                    {...register('unit', { required: 'Unidad requerida' })}
+                    label="Unidad"
+                  >
+                    <MenuItem value="Toneladas">Toneladas</MenuItem>
+                    <MenuItem value="Metros cúbicos">Metros cúbicos</MenuItem>
+                    <MenuItem value="Bolsas">Bolsas</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
 
-                <FormControl isInvalid={!!errors.currentStock}>
-                  <FormLabel>Stock Actual</FormLabel>
-                  <Input
-                    type="number"
-                    {...register('currentStock', { 
-                      required: 'Stock actual requerido',
-                      min: { value: 0, message: 'Debe ser mayor a 0' }
-                    })}
-                  />
-                </FormControl>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('currentStock', { 
+                    required: 'Stock actual requerido',
+                    min: { value: 0, message: 'Debe ser mayor a 0' }
+                  })}
+                  label="Stock Actual"
+                  type="number"
+                  fullWidth
+                  error={!!errors.currentStock}
+                  helperText={errors.currentStock?.message}
+                />
+              </Grid>
 
-                <FormControl isInvalid={!!errors.minStock}>
-                  <FormLabel>Stock Mínimo</FormLabel>
-                  <Input
-                    type="number"
-                    {...register('minStock', { 
-                      required: 'Stock mínimo requerido',
-                      min: { value: 0, message: 'Debe ser mayor a 0' }
-                    })}
-                  />
-                </FormControl>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('minStock', { 
+                    required: 'Stock mínimo requerido',
+                    min: { value: 0, message: 'Debe ser mayor a 0' }
+                  })}
+                  label="Stock Mínimo"
+                  type="number"
+                  fullWidth
+                  error={!!errors.minStock}
+                  helperText={errors.minStock?.message}
+                />
+              </Grid>
 
-                <FormControl isInvalid={!!errors.location}>
-                  <FormLabel>Ubicación</FormLabel>
-                  <Input {...register('location', { required: 'Ubicación requerida' })} />
-                </FormControl>
-              </VStack>
-            </ModalBody>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('location', { required: 'Ubicación requerida' })}
+                  label="Ubicación"
+                  fullWidth
+                  error={!!errors.location}
+                  helperText={errors.location?.message}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
 
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button type="submit" colorScheme="brand">
-                {editingMaterial ? 'Actualizar' : 'Agregar'}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained">
+              {editingMaterial ? 'Actualizar' : 'Agregar'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </Box>
   );
 }

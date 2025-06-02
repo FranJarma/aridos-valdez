@@ -2,26 +2,31 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Heading,
-  Grid,
-  GridItem,
-  Card,
-  CardBody,
-  CardHeader,
-  Select,
+  Typography,
   Button,
-  HStack,
-  VStack,
-  Text,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  useColorModeValue,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  LinearProgress,
   Alert,
-  AlertIcon,
-} from '@chakra-ui/react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+} from '@mui/material';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 
 const productionData = [
@@ -50,13 +55,11 @@ const machineryEfficiency = [
 export function ReportsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const { hasPermission } = useAuth();
-  const cardBg = useColorModeValue('white', 'gray.800');
 
   if (!hasPermission('view_reports')) {
     return (
       <Box>
-        <Alert status="error">
-          <AlertIcon />
+        <Alert severity="error">
           No tienes permisos para acceder a los reportes.
         </Alert>
       </Box>
@@ -65,101 +68,126 @@ export function ReportsPage() {
 
   return (
     <Box>
-      <HStack justify="space-between" mb={6}>
-        <Heading color="aridos.primary">Reportes y Analíticas</Heading>
-        <HStack spacing={4}>
-          <Select value={selectedPeriod} onChange={(e) => setSelectedPeriod(e.target.value)} maxW="200px">
-            <option value="week">Esta semana</option>
-            <option value="month">Este mes</option>
-            <option value="quarter">Este trimestre</option>
-            <option value="year">Este año</option>
-          </Select>
-          <Button colorScheme="brand">Exportar PDF</Button>
-        </HStack>
-      </HStack>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="h4" color="primary">
+          Reportes y Analíticas
+        </Typography>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>Período</InputLabel>
+            <Select
+              value={selectedPeriod}
+              label="Período"
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+            >
+              <MenuItem value="week">Esta semana</MenuItem>
+              <MenuItem value="month">Este mes</MenuItem>
+              <MenuItem value="quarter">Este trimestre</MenuItem>
+              <MenuItem value="year">Este año</MenuItem>
+            </Select>
+          </FormControl>
+          <Button variant="contained">Exportar PDF</Button>
+        </Stack>
+      </Stack>
 
       {/* KPI Cards */}
-      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={6} mb={8}>
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Producción Total</StatLabel>
-                <StatNumber color="aridos.primary">24,580 Ton</StatNumber>
-                <StatHelpText>+15% vs mes anterior</StatHelpText>
-              </Stat>
-            </CardBody>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Producción Total
+              </Typography>
+              <Typography variant="h4" color="primary">
+                24,580 Ton
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                +15% vs mes anterior
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Eficiencia Promedio</StatLabel>
-                <StatNumber color="green.500">85.8%</StatNumber>
-                <StatHelpText>+3.2% vs mes anterior</StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Eficiencia Promedio
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                85.8%
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                +3.2% vs mes anterior
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Costos Operativos</StatLabel>
-                <StatNumber color="red.500">$125,400</StatNumber>
-                <StatHelpText>-8% vs mes anterior</StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Costos Operativos
+              </Typography>
+              <Typography variant="h4" color="error.main">
+                $125,400
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                -8% vs mes anterior
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardBody>
-              <Stat>
-                <StatLabel>Tiempo Inactividad</StatLabel>
-                <StatNumber color="orange.500">12.3 hrs</StatNumber>
-                <StatHelpText>-25% vs mes anterior</StatHelpText>
-              </Stat>
-            </CardBody>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary" gutterBottom>
+                Tiempo Inactividad
+              </Typography>
+              <Typography variant="h4" color="warning.main">
+                12.3 hrs
+              </Typography>
+              <Typography variant="body2" color="success.main">
+                -25% vs mes anterior
+              </Typography>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
       </Grid>
 
       {/* Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={6} mb={8}>
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardHeader>
-              <Heading size="md">Producción vs Objetivo Mensual</Heading>
-            </CardHeader>
-            <CardBody>
-              <Box h="300px">
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} lg={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Producción vs Objetivo Mensual
+              </Typography>
+              <Box sx={{ height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={productionData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="target" fill="#E2E8F0" name="Objetivo" />
+                    <Bar dataKey="target" fill="#E0E0E0" name="Objetivo" />
                     <Bar dataKey="production" fill="#8B4513" name="Producción" />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
-            </CardBody>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
 
-        <GridItem>
-          <Card bg={cardBg}>
-            <CardHeader>
-              <Heading size="md">Distribución de Materiales</Heading>
-            </CardHeader>
-            <CardBody>
-              <Box h="300px">
+        <Grid item xs={12} lg={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Distribución de Materiales
+              </Typography>
+              <Box sx={{ height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -178,41 +206,38 @@ export function ReportsPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </Box>
-            </CardBody>
+            </CardContent>
           </Card>
-        </GridItem>
+        </Grid>
       </Grid>
 
       {/* Machinery Efficiency */}
-      <Card bg={cardBg}>
-        <CardHeader>
-          <Heading size="md">Eficiencia de Maquinaria</Heading>
-        </CardHeader>
-        <CardBody>
-          <VStack spacing={4} align="stretch">
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Eficiencia de Maquinaria
+          </Typography>
+          <Stack spacing={3}>
             {machineryEfficiency.map((machine) => (
-              <HStack key={machine.machine} justify="space-between">
-                <Text fontWeight="medium" minW="150px">{machine.machine}</Text>
-                <Box flex={1} mx={4}>
-                  <Box
-                    bg="gray.200"
-                    height="20px"
-                    borderRadius="full"
-                    overflow="hidden"
-                  >
-                    <Box
-                      bg={machine.efficiency >= 90 ? 'green.500' : machine.efficiency >= 80 ? 'yellow.500' : 'red.500'}
-                      height="100%"
-                      width={`${machine.efficiency}%`}
-                      borderRadius="full"
-                    />
-                  </Box>
+              <Stack key={machine.machine} direction="row" alignItems="center" spacing={2}>
+                <Typography variant="body1" sx={{ minWidth: 150, fontWeight: 'medium' }}>
+                  {machine.machine}
+                </Typography>
+                <Box sx={{ flexGrow: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={machine.efficiency}
+                    color={machine.efficiency >= 90 ? 'success' : machine.efficiency >= 80 ? 'warning' : 'error'}
+                    sx={{ height: 20, borderRadius: 1 }}
+                  />
                 </Box>
-                <Text fontWeight="bold" minW="50px">{machine.efficiency}%</Text>
-              </HStack>
+                <Typography variant="body1" sx={{ minWidth: 50, fontWeight: 'bold' }}>
+                  {machine.efficiency}%
+                </Typography>
+              </Stack>
             ))}
-          </VStack>
-        </CardBody>
+          </Stack>
+        </CardContent>
       </Card>
     </Box>
   );
