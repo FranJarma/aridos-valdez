@@ -40,6 +40,7 @@ interface Movement {
   destination?: string;
   userName: string;
   notes?: string;
+  role?: string;
   createdAt: string;
 }
 
@@ -66,7 +67,11 @@ const mockMovements: Movement[] = [
   },
 ];
 
+const currentUserRole = "admin"; // Simulando role del usuario actual
+
 export function MovementsPage() {
+  if (currentUserRole === "admin") return null;
+
   const [movements, setMovements] = useState<Movement[]>(mockMovements);
   const [filter, setFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -175,8 +180,8 @@ export function MovementsPage() {
         </CardContent>
       </Card>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Tipo</TableCell>
@@ -190,7 +195,7 @@ export function MovementsPage() {
           </TableHead>
           <TableBody>
             {filteredMovements.map((movement) => (
-              <TableRow key={movement.id}>
+              <TableRow key={movement.id} hover>
                 <TableCell>
                   <Chip
                     color={getTypeColor(movement.type) as any}
@@ -198,7 +203,7 @@ export function MovementsPage() {
                     size="small"
                   />
                 </TableCell>
-                <TableCell sx={{ fontWeight: "medium" }}>
+                <TableCell sx={{ fontWeight: 500 }}>
                   {movement.materialName}
                 </TableCell>
                 <TableCell>{movement.quantity}</TableCell>
@@ -215,7 +220,7 @@ export function MovementsPage() {
                       </Typography>
                     )}
                     {movement.type === "transferencia" && (
-                      <Box>
+                      <>
                         {movement.origin && (
                           <Typography variant="caption">
                             <strong>Desde:</strong> {movement.origin}
@@ -226,7 +231,7 @@ export function MovementsPage() {
                             <strong>Hacia:</strong> {movement.destination}
                           </Typography>
                         )}
-                      </Box>
+                      </>
                     )}
                     {movement.machineryName && (
                       <Typography variant="caption" color="primary">
@@ -248,7 +253,6 @@ export function MovementsPage() {
         </Table>
       </TableContainer>
 
-      {/* Dialog for Add Movement */}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -363,6 +367,16 @@ export function MovementsPage() {
               </Grid>
 
               <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Rol</InputLabel>
+                  <Select {...register("role")} label="Rol">
+                    <MenuItem value="admin">Administrador</MenuItem>
+                    <MenuItem value="user">Usuario</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
                 <TextField
                   {...register("notes")}
                   label="Notas (Opcional)"
@@ -374,7 +388,6 @@ export function MovementsPage() {
               </Grid>
             </Grid>
           </DialogContent>
-
           <DialogActions>
             <Button onClick={() => setOpen(false)}>Cancelar</Button>
             <Button type="submit" variant="contained">
@@ -385,3 +398,4 @@ export function MovementsPage() {
       </Dialog>
     </Box>
   );
+}
