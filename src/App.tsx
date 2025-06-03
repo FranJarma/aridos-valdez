@@ -57,18 +57,18 @@ export default function App() {
                           />
                           <Route
                             element={<MaterialsPage />}
-                            path="/materials"
+                            path="/materiales"
                           />
                           <Route
                             element={<MachineryPage />}
-                            path="/machinery"
+                            path="/maquinaria"
                           />
                           <Route
                             element={<MovementsPage />}
-                            path="/movements"
+                            path="/movimientos"
                           />
-                          <Route element={<UsersPage />} path="/users" />
-                          <Route element={<ReportsPage />} path="/reports" />
+                          <Route element={<UsersPage />} path="/usuarios" />
+                          <Route element={<ReportsPage />} path="/reportes" />
                           <Route
                             element={<Navigate replace to="/dashboard" />}
                             path="/"

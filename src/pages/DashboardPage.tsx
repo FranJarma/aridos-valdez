@@ -230,7 +230,7 @@ export function DashboardPage() {
               >
                 Distribución de Materiales
               </Typography>
-              <Box sx={{ width: "100%", height: "calc(100% - 100px)" }}>
+              <Box sx={{ width: "100%", height: "calc(100% - 150px)" }}>
                 <ResponsiveContainer height="100%" width="100%">
                   <PieChart>
                     <Pie

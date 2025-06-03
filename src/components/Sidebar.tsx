@@ -18,7 +18,6 @@ import {
   Tooltip,
   Divider,
 } from "@mui/material";
-import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -37,31 +36,31 @@ const menuItems = [
   },
   {
     label: "Materiales",
-    path: "/materials",
+    path: "/materiales",
     icon: InventoryIcon,
     permission: "read",
   },
   {
     label: "Maquinaria",
-    path: "/machinery",
+    path: "/maquinaria",
     icon: MachineryIcon,
     permission: "read",
   },
   {
     label: "Movimientos",
-    path: "/movements",
+    path: "/movimientos",
     icon: MovementsIcon,
     permission: "read",
   },
   {
     label: "Usuarios",
-    path: "/users",
+    path: "/usuarios",
     icon: PeopleIcon,
     permission: "manage_users",
   },
   {
     label: "Reportes",
-    path: "/reports",
+    path: "/reportes",
     icon: AnalyticsIcon,
     permission: "read",
   },
@@ -145,7 +144,6 @@ export function Sidebar({ collapsed = false, onItemClick }: SidebarProps) {
         bgcolor: "background.paper",
       }}
     >
-      {/* Logo Header */}
       <Box
         sx={{
           height: 64,
@@ -168,16 +166,13 @@ export function Sidebar({ collapsed = false, onItemClick }: SidebarProps) {
         />
       </Box>
 
-      {/* Navigation Items */}
       <Box sx={{ flex: 1, pt: 2 }}>
         <List disablePadding>{menuItems.map(renderMenuItem)}</List>
       </Box>
 
-      {/* User Section at Bottom */}
       <Box sx={{ mt: "auto", p: 2 }}>
         <Divider sx={{ mb: 2 }} />
 
-        {/* User Info */}
         {!collapsed && (
           <Box
             sx={{

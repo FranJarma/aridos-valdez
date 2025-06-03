@@ -72,20 +72,11 @@ export function LoginPage() {
         >
           <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Box sx={{ textAlign: "center", mb: 4 }}>
-              <Typography
-                component="h1"
-                sx={{ fontWeight: 700, color: "text.primary", mb: 2 }}
-                variant="h3"
-              >
-                Áridos Valdez
-              </Typography>
-              <Typography
-                color="text.secondary"
-                sx={{ fontSize: "1rem" }}
-                variant="body1"
-              >
-                Sistema de Gestión de Materiales
-              </Typography>
+              <img
+                alt="Áridos Valdez Logo"
+                src="/aridos-valdez-logo.webp"
+                width={100}
+              />
             </Box>
 
             <form onSubmit={handleSubmit(onSubmit)}>

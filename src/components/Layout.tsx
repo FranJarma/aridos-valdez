@@ -39,7 +39,6 @@ export function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const currentDrawerWidth = sidebarCollapsed
     ? collapsedDrawerWidth
@@ -80,8 +79,8 @@ export function Layout({ children }: LayoutProps) {
           borderBottom: "1px solid",
           borderColor: "divider",
           transition: theme.transitions.create(["margin", "width"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.standard,
           }),
         }}
       >
