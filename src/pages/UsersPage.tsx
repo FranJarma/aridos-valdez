@@ -259,6 +259,11 @@ export function UsersPage() {
                   <Select
                     {...register('role', { required: 'Rol requerido' })}
                     label="Rol"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      }
+                    }}
                   >
                     <MenuItem value="admin">Administrador</MenuItem>
                     <MenuItem value="operator">Operador</MenuItem>

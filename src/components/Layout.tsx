@@ -4,7 +4,6 @@ import {
   Box,
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
   Avatar,
   Menu,
@@ -14,9 +13,11 @@ import {
   useMediaQuery,
   Chip,
   Stack,
+  Tooltip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
+  MenuOpen as MenuOpenIcon,
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
@@ -28,18 +29,26 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-const drawerWidth = 250;
+const drawerWidth = 280;
+const collapsedDrawerWidth = 72;
 
 export function Layout({ children }: LayoutProps) {
   const { user, signOut } = useAuth();
   const { isOnline, pendingOperations } = useOffline();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const currentDrawerWidth = sidebarCollapsed ? collapsedDrawerWidth : drawerWidth;
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -61,14 +70,21 @@ export function Layout({ children }: LayoutProps) {
       <AppBar
         position="fixed"
         sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
+          width: { md: `calc(100% - ${currentDrawerWidth}px)` },
+          ml: { md: `${currentDrawerWidth}px` },
           bgcolor: 'background.paper',
           color: 'text.primary',
-          boxShadow: 1,
+          boxShadow: 'none',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: 64 }}>
+          {/* Mobile menu button */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -78,46 +94,85 @@ export function Layout({ children }: LayoutProps) {
           >
             <MenuIcon />
           </IconButton>
+
+          {/* Desktop sidebar toggle */}
+          <Tooltip title={sidebarCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}>
+            <IconButton
+              color="inherit"
+              onClick={handleSidebarToggle}
+              sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+            >
+              {sidebarCollapsed ? <MenuIcon /> : <MenuOpenIcon />}
+            </IconButton>
+          </Tooltip>
           
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'primary.main' }}>
-            Áridos Valdez SRL
-          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
 
           <Stack direction="row" spacing={1} alignItems="center">
             {!isOnline && (
-              <Chip label="Offline" color="warning" size="small" />
+              <Chip 
+                label="Offline" 
+                color="warning" 
+                size="small"
+                sx={{ 
+                  fontSize: '0.75rem',
+                  height: 24,
+                  borderRadius: 3
+                }}
+              />
             )}
             {pendingOperations.length > 0 && (
               <Chip 
                 label={`${pendingOperations.length} pendientes`} 
                 color="info" 
-                size="small" 
+                size="small"
+                sx={{ 
+                  fontSize: '0.75rem',
+                  height: 24,
+                  borderRadius: 3
+                }}
               />
             )}
             
-            <IconButton color="inherit">
-              <NotificationsIcon />
-            </IconButton>
-            
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <Avatar
-                sx={{ 
-                  width: 32, 
-                  height: 32, 
-                  bgcolor: 'primary.main',
-                  fontSize: '0.875rem'
+            <Tooltip title="Notificaciones">
+              <IconButton 
+                color="inherit"
+                sx={{
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  }
                 }}
               >
-                {(user?.profile?.name || user?.email || 'U').charAt(0).toUpperCase()}
-              </Avatar>
-            </IconButton>
+                <NotificationsIcon />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="Perfil de usuario">
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+                sx={{
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  }
+                }}
+              >
+                <Avatar
+                  sx={{ 
+                    width: 36, 
+                    height: 36, 
+                    bgcolor: 'primary.main',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  {(user?.profile?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                </Avatar>
+              </IconButton>
+            </Tooltip>
             
             <Menu
               id="menu-appbar"
@@ -133,22 +188,29 @@ export function Layout({ children }: LayoutProps) {
               }}
               open={Boolean(anchorEl)}
               onClose={handleClose}
+              sx={{
+                '& .MuiPaper-root': {
+                  borderRadius: 2,
+                  minWidth: 200,
+                  boxShadow: theme.shadows[8],
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }
+              }}
             >
-              <MenuItem disabled>
-                <Box>
-                  <Typography variant="body2" fontWeight="bold">
-                    {user?.profile?.name || 'Usuario'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {user?.profile?.role || 'Sin rol'}
-                  </Typography>
+              <MenuItem disabled sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Box sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>
+                  {user?.profile?.name || 'Usuario'}
+                </Box>
+                <Box sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                  {user?.profile?.role || 'Sin rol'}
                 </Box>
               </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <SettingsIcon sx={{ mr: 1 }} />
+              <MenuItem onClick={handleClose} sx={{ borderRadius: 1, mx: 1 }}>
+                <SettingsIcon sx={{ mr: 1.5, fontSize: '1.25rem' }} />
                 Configuración
               </MenuItem>
-              <MenuItem onClick={handleSignOut}>
+              <MenuItem onClick={handleSignOut} sx={{ borderRadius: 1, mx: 1, mb: 1 }}>
                 Cerrar Sesión
               </MenuItem>
             </Menu>
@@ -159,8 +221,8 @@ export function Layout({ children }: LayoutProps) {
       {/* Sidebar */}
       <Box
         component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        aria-label="mailbox folders"
+        sx={{ width: { md: currentDrawerWidth }, flexShrink: { md: 0 } }}
+        aria-label="navigation menu"
       >
         {/* Mobile drawer */}
         <Drawer
@@ -172,7 +234,12 @@ export function Layout({ children }: LayoutProps) {
           }}
           sx={{
             display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: drawerWidth,
+              borderRight: '1px solid',
+              borderColor: 'divider'
+            },
           }}
         >
           <Sidebar onItemClick={handleDrawerToggle} />
@@ -185,14 +252,18 @@ export function Layout({ children }: LayoutProps) {
             display: { xs: 'none', md: 'block' },
             '& .MuiDrawer-paper': { 
               boxSizing: 'border-box', 
-              width: drawerWidth,
-              borderRight: 1,
-              borderColor: 'divider'
+              width: currentDrawerWidth,
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+              }),
             },
           }}
           open
         >
-          <Sidebar />
+          <Sidebar collapsed={sidebarCollapsed} />
         </Drawer>
       </Box>
 
@@ -202,9 +273,13 @@ export function Layout({ children }: LayoutProps) {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          width: { md: `calc(100% - ${currentDrawerWidth}px)` },
           mt: 8,
           overflow: 'auto',
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
         {children}

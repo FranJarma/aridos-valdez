@@ -300,3 +300,188 @@ export function MaterialsPage() {
     </Box>
   );
 }
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  Stack,
+  TextField,
+  Card,
+  CardContent,
+  Alert,
+  LinearProgress,
+} from '@mui/material';
+import { Add as AddIcon, Inventory as InventoryIcon } from '@mui/icons-material';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Material {
+  id: string;
+  name: string;
+  type: string;
+  unit: string;
+  currentStock: number;
+  minStock: number;
+  location: string;
+}
+
+const mockMaterials: Material[] = [
+  {
+    id: '1',
+    name: 'Arena Fina',
+    type: 'Arena',
+    unit: 'm³',
+    currentStock: 150,
+    minStock: 50,
+    location: 'Depósito A',
+  },
+  {
+    id: '2',
+    name: 'Grava 12mm',
+    type: 'Grava',
+    unit: 'm³',
+    currentStock: 30,
+    minStock: 40,
+    location: 'Depósito B',
+  },
+  {
+    id: '3',
+    name: 'Piedra Triturada',
+    type: 'Piedra',
+    unit: 'm³',
+    currentStock: 200,
+    minStock: 75,
+    location: 'Cantera',
+  },
+];
+
+export function MaterialsPage() {
+  const [materials, setMaterials] = useState<Material[]>(mockMaterials);
+  const [filter, setFilter] = useState('');
+  const { hasPermission } = useAuth();
+
+  if (!hasPermission('read')) {
+    return (
+      <Box>
+        <Alert severity="error">
+          No tienes permisos para acceder a esta sección.
+        </Alert>
+      </Box>
+    );
+  }
+
+  const filteredMaterials = materials.filter(material =>
+    material.name.toLowerCase().includes(filter.toLowerCase()) ||
+    material.type.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const getStockStatus = (current: number, min: number) => {
+    const percentage = (current / min) * 100;
+    if (percentage < 100) return { color: 'error', label: 'Stock Bajo' };
+    if (percentage < 150) return { color: 'warning', label: 'Stock Medio' };
+    return { color: 'success', label: 'Stock Alto' };
+  };
+
+  return (
+    <Box>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+            Gestión de Materiales
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Control de inventario y stock de materiales
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          sx={{ borderRadius: 2 }}
+        >
+          Agregar Material
+        </Button>
+      </Stack>
+
+      <Card sx={{ mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <InventoryIcon sx={{ color: 'text.secondary' }} />
+            <TextField
+              placeholder="Buscar materiales..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              sx={{ minWidth: 300 }}
+              size="small"
+            />
+          </Stack>
+        </CardContent>
+      </Card>
+
+      <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600 }}>Material</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Tipo</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Stock Actual</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Stock Mínimo</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Estado</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Ubicación</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredMaterials.map((material) => {
+                const stockStatus = getStockStatus(material.currentStock, material.minStock);
+                const stockPercentage = Math.min((material.currentStock / material.minStock) * 100, 100);
+                
+                return (
+                  <TableRow key={material.id} hover>
+                    <TableCell sx={{ fontWeight: 500 }}>{material.name}</TableCell>
+                    <TableCell>{material.type}</TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {material.currentStock} {material.unit}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={stockPercentage}
+                          color={stockStatus.color as any}
+                          sx={{ 
+                            height: 4, 
+                            borderRadius: 2, 
+                            mt: 0.5,
+                            bgcolor: 'grey.200'
+                          }}
+                        />
+                      </Box>
+                    </TableCell>
+                    <TableCell>{material.minStock} {material.unit}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        color={stockStatus.color as any} 
+                        label={stockStatus.label} 
+                        size="small"
+                        sx={{ borderRadius: 2 }}
+                      />
+                    </TableCell>
+                    <TableCell>{material.location}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+    </Box>
+  );
+}

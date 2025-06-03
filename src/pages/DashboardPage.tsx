@@ -2,162 +2,196 @@
 import React from 'react';
 import {
   Box,
-  Grid,
+  Typography,
   Card,
   CardContent,
-  Typography,
-  LinearProgress,
-  Chip,
+  Grid,
   Stack,
-  Paper,
+  Chip,
 } from '@mui/material';
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
+import {
+  Inventory as InventoryIcon,
+  Build as MachineryIcon,
+  TrendingUp as TrendingUpIcon,
+  LocalShipping as ShippingIcon,
+} from '@mui/icons-material';
 
 const mockData = {
-  dailyProduction: [
-    { name: 'Lun', value: 150 },
-    { name: 'Mar', value: 200 },
-    { name: 'Mié', value: 180 },
-    { name: 'Jue', value: 220 },
-    { name: 'Vie', value: 190 },
-    { name: 'Sáb', value: 250 },
-    { name: 'Dom', value: 100 },
+  stats: [
+    {
+      title: 'Total Materiales',
+      value: '1,234',
+      change: '+12%',
+      changeType: 'positive' as const,
+      icon: InventoryIcon,
+      color: 'primary',
+    },
+    {
+      title: 'Maquinaria Activa',
+      value: '48',
+      change: '+5%',
+      changeType: 'positive' as const,
+      icon: MachineryIcon,
+      color: 'secondary',
+    },
+    {
+      title: 'Producción Mensual',
+      value: '8,567 m³',
+      change: '+18%',
+      changeType: 'positive' as const,
+      icon: TrendingUpIcon,
+      color: 'success',
+    },
+    {
+      title: 'Entregas',
+      value: '156',
+      change: '-3%',
+      changeType: 'negative' as const,
+      icon: ShippingIcon,
+      color: 'warning',
+    },
   ],
-  materialStock: [
-    { material: 'Arena', stock: 75, min: 20 },
-    { material: 'Grava', stock: 45, min: 30 },
-    { material: 'Piedra', stock: 90, min: 25 },
-    { material: 'Cemento', stock: 15, min: 10 },
+  dailyProduction: [
+    { name: 'Lun', value: 2400 },
+    { name: 'Mar', value: 1398 },
+    { name: 'Mié', value: 9800 },
+    { name: 'Jue', value: 3908 },
+    { name: 'Vie', value: 4800 },
+    { name: 'Sáb', value: 3800 },
+    { name: 'Dom', value: 4300 },
+  ],
+  materialDistribution: [
+    { name: 'Arena', value: 400, color: '#1976d2' },
+    { name: 'Grava', value: 300, color: '#388e3c' },
+    { name: 'Piedra', value: 200, color: '#f57c00' },
+    { name: 'Cemento', value: 100, color: '#7b1fa2' },
   ],
 };
 
 export function DashboardPage() {
-  const getStockStatus = (stock: number, min: number) => {
-    const percentage = (stock / (min * 2)) * 100;
-    if (percentage <= 50) return { color: 'error', label: 'Crítico' };
-    if (percentage <= 75) return { color: 'warning', label: 'Bajo' };
-    return { color: 'success', label: 'Normal' };
-  };
-
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+    <Box sx={{ width: '100%', height: '100%' }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+        <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
           Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Resumen general de la planta de áridos
+          Resumen general del sistema de gestión
         </Typography>
       </Box>
 
+      {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Producción Diaria
-                </Typography>
-                <Box sx={{ 
-                  width: 8, 
-                  height: 8, 
-                  borderRadius: '50%', 
-                  bgcolor: 'success.main',
-                  animation: 'pulse 2s infinite'
-                }} />
-              </Box>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                1,245
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Toneladas
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
-                  +23.36%
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  vs ayer
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Eficiencia Promedio
-              </Typography>
-              <Typography variant="h4" color="primary">
-                87.2%
-              </Typography>
-              <Typography variant="body2" color="success.main">
-                +2.1% ↗
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Máquinas Activas
-              </Typography>
-              <Typography variant="h4" color="primary">
-                8/12
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                4 en mantenimiento
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Stock Bajo
-              </Typography>
-              <Typography variant="h4" color="warning.main">
-                3
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                materiales críticos
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {mockData.stats.map((stat, index) => {
+          const IconComponent = stat.icon;
+          return (
+            <Grid item xs={12} sm={6} lg={3} key={index}>
+              <Card 
+                sx={{ 
+                  height: '100%',
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 4,
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        bgcolor: `${stat.color}.light`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <IconComponent sx={{ color: `${stat.color}.main`, fontSize: 24 }} />
+                    </Box>
+                    <Chip
+                      label={stat.change}
+                      size="small"
+                      color={stat.changeType === 'positive' ? 'success' : 'error'}
+                      sx={{ 
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        borderRadius: 2
+                      }}
+                    />
+                  </Stack>
+                  
+                  <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, color: 'text.primary' }}>
+                    {stat.value}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {stat.title}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
 
+      {/* Charts */}
       <Grid container spacing={3}>
         <Grid item xs={12} lg={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+          <Card sx={{ 
+            height: 400,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <CardContent sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
                 Producción Semanal
               </Typography>
-              <Box sx={{ height: 300 }}>
+              <Box sx={{ width: '100%', height: 'calc(100% - 60px)' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={mockData.dailyProduction}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#8B4513" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="name" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#1976d2" 
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
@@ -166,40 +200,63 @@ export function DashboardPage() {
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Estado de Stock
+          <Card sx={{ 
+            height: 400,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <CardContent sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+                Distribución de Materiales
               </Typography>
-              <Stack spacing={2}>
-                {mockData.materialStock.map((item) => {
-                  const status = getStockStatus(item.stock, item.min);
-                  const percentage = Math.min((item.stock / (item.min * 2)) * 100, 100);
-                  
-                  return (
-                    <Box key={item.material}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="body2" fontWeight="medium">
-                          {item.material}
-                        </Typography>
-                        <Chip 
-                          label={status.label} 
-                          color={status.color as any}
-                          size="small" 
-                        />
-                      </Box>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={percentage}
-                        color={status.color as any}
-                        sx={{ height: 8, borderRadius: 1 }}
-                      />
-                      <Typography variant="caption" color="text.secondary">
-                        {item.stock} / {item.min * 2} unidades
-                      </Typography>
-                    </Box>
-                  );
-                })}
+              <Box sx={{ width: '100%', height: 'calc(100% - 100px)' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={mockData.materialDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {mockData.materialDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+              
+              <Stack spacing={1} sx={{ mt: 2 }}>
+                {mockData.materialDistribution.map((item, index) => (
+                  <Stack key={index} direction="row" alignItems="center" spacing={1}>
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        bgcolor: item.color,
+                      }}
+                    />
+                    <Typography variant="body2" sx={{ flex: 1, fontWeight: 500 }}>
+                      {item.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.value}
+                    </Typography>
+                  </Stack>
+                ))}
               </Stack>
             </CardContent>
           </Card>

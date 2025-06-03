@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
@@ -8,13 +7,13 @@ import { AuthProvider } from './contexts/AuthContext';
 import { OfflineProvider } from './contexts/OfflineContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
-import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { LoginPage } from './pages/LoginPage';
+import { UsersPage } from './pages/UsersPage';
+import { ReportsPage } from './pages/ReportsPage';
 import { MaterialsPage } from './pages/MaterialsPage';
 import { MachineryPage } from './pages/MachineryPage';
 import { MovementsPage } from './pages/MovementsPage';
-import { UsersPage } from './pages/UsersPage';
-import { ReportsPage } from './pages/ReportsPage';
 import { theme } from './theme';
 
 const queryClient = new QueryClient({
@@ -49,6 +48,7 @@ export default function App() {
                           <Route path="/movements" element={<MovementsPage />} />
                           <Route path="/users" element={<UsersPage />} />
                           <Route path="/reports" element={<ReportsPage />} />
+                          <Route path="/" element={<Navigate to="/dashboard" replace />} />
                         </Routes>
                       </Layout>
                     </ProtectedRoute>
