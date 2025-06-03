@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { Add as AddIcon } from "@mui/icons-material";
 import {
   Box,
   Typography,
@@ -25,23 +25,23 @@ import {
   DialogActions,
   Grid,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 
 interface Movement {
-  id: string;
-  type: "entrada" | "salida" | "transferencia";
-  materialName: string;
-  machineryName?: string;
-  quantity: number;
-  origin?: string;
-  destination?: string;
-  userName: string;
-  notes?: string;
-  role?: string;
   createdAt: string;
+  destination?: string;
+  id: string;
+  machineryName?: string;
+  materialName: string;
+  notes?: string;
+  origin?: string;
+  quantity: number;
+  role?: string;
+  type: "entrada" | "salida" | "transferencia";
+  userName: string;
 }
 
 const mockMovements: Movement[] = [
@@ -67,22 +67,18 @@ const mockMovements: Movement[] = [
   },
 ];
 
-const currentUserRole = "admin"; // Simulando role del usuario actual
-
 export function MovementsPage() {
-  if (currentUserRole === "admin") return null;
-
   const [movements, setMovements] = useState<Movement[]>(mockMovements);
   const [filter, setFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [open, setOpen] = useState(false);
 
   const {
-    register,
+    formState: { errors },
     handleSubmit,
+    register,
     reset,
     watch,
-    formState: { errors },
   } = useForm<Movement>();
 
   const watchedType = watch("type");
@@ -91,7 +87,7 @@ export function MovementsPage() {
     (movement) =>
       (movement.materialName.toLowerCase().includes(filter.toLowerCase()) ||
         movement.type.includes(filter.toLowerCase())) &&
-      (typeFilter === "" || movement.type === typeFilter),
+      (typeFilter === "" || movement.type === typeFilter)
   );
 
   const onSubmit = (data: Movement) => {
@@ -136,17 +132,17 @@ export function MovementsPage() {
   return (
     <Box>
       <Stack
+        alignItems="center"
         direction="row"
         justifyContent="space-between"
-        alignItems="center"
         sx={{ mb: 3 }}
       >
-        <Typography variant="h4" color="primary">
+        <Typography color="primary" variant="h4">
           Movimientos de Materiales
         </Typography>
         <Button
-          variant="contained"
           startIcon={<AddIcon />}
+          variant="contained"
           onClick={() => setOpen(true)}
         >
           Registrar Movimiento
@@ -155,19 +151,19 @@ export function MovementsPage() {
 
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack alignItems="center" direction="row" spacing={2}>
             <TextField
               placeholder="Buscar movimientos..."
+              size="small"
+              sx={{ minWidth: 300 }}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              sx={{ minWidth: 300 }}
-              size="small"
             />
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Filtrar por tipo</InputLabel>
               <Select
-                value={typeFilter}
                 label="Filtrar por tipo"
+                value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
               >
                 <MenuItem value="">Todos</MenuItem>
@@ -227,14 +223,14 @@ export function MovementsPage() {
                           </Typography>
                         )}
                         {movement.destination && (
-                          <Typography variant="caption" display="block">
+                          <Typography display="block" variant="caption">
                             <strong>Hacia:</strong> {movement.destination}
                           </Typography>
                         )}
                       </>
                     )}
                     {movement.machineryName && (
-                      <Typography variant="caption" color="primary">
+                      <Typography color="primary" variant="caption">
                         <strong>Máquina:</strong> {movement.machineryName}
                       </Typography>
                     )}
@@ -254,16 +250,16 @@ export function MovementsPage() {
       </TableContainer>
 
       <Dialog
+        fullWidth
+        maxWidth="md"
         open={open}
         onClose={() => setOpen(false)}
-        maxWidth="md"
-        fullWidth
       >
         <DialogTitle>Registrar Movimiento</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.type}>
                   <InputLabel>Tipo de Movimiento</InputLabel>
                   <Select
@@ -277,7 +273,7 @@ export function MovementsPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.materialName}>
                   <InputLabel>Material</InputLabel>
                   <Select
@@ -293,64 +289,64 @@ export function MovementsPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   {...register("quantity", {
                     required: "Cantidad requerida",
                     min: { value: 0.1, message: "Debe ser mayor a 0" },
                   })}
-                  label="Cantidad"
-                  type="number"
                   fullWidth
                   error={!!errors.quantity}
                   helperText={errors.quantity?.message}
+                  label="Cantidad"
+                  type="number"
                 />
               </Grid>
 
               {watchedType === "entrada" && (
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     {...register("origin")}
+                    fullWidth
                     label="Origen"
                     placeholder="Ej: Proveedor A, Cantera Norte"
-                    fullWidth
                   />
                 </Grid>
               )}
 
               {watchedType === "salida" && (
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     {...register("destination")}
+                    fullWidth
                     label="Destino"
                     placeholder="Ej: Obra Central, Cliente XYZ"
-                    fullWidth
                   />
                 </Grid>
               )}
 
               {watchedType === "transferencia" && (
                 <>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       {...register("origin")}
+                      fullWidth
                       label="Origen"
                       placeholder="Ubicación de origen"
-                      fullWidth
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       {...register("destination")}
+                      fullWidth
                       label="Destino"
                       placeholder="Ubicación de destino"
-                      fullWidth
                     />
                   </Grid>
                 </>
               )}
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Maquinaria Asociada (Opcional)</InputLabel>
                   <Select
@@ -366,24 +362,14 @@ export function MovementsPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Rol</InputLabel>
-                  <Select {...register("role")} label="Rol">
-                    <MenuItem value="admin">Administrador</MenuItem>
-                    <MenuItem value="user">Usuario</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   {...register("notes")}
+                  fullWidth
+                  multiline
                   label="Notas (Opcional)"
                   placeholder="Observaciones adicionales..."
-                  multiline
                   rows={3}
-                  fullWidth
                 />
               </Grid>
             </Grid>

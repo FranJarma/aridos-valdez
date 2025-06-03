@@ -1,26 +1,26 @@
+import type { User } from "@supabase/supabase-js";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase, Database } from '../lib/supabase';
+import { supabase, type Database } from "../lib/supabase";
 
 interface AuthUser extends User {
-  profile?: Database['public']['Tables']['users']['Row'];
+  profile?: Database["public"]["Tables"]["users"]["Row"];
 }
 
 interface AuthContextType {
-  user: AuthUser | null;
+  hasPermission: (permission: string) => boolean;
+  loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  loading: boolean;
-  hasPermission: (permission: string) => boolean;
+  user: AuthUser | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const rolePermissions = {
-  admin: ['read', 'write', 'delete', 'manage_users', 'view_reports'],
-  operator: ['read', 'write', 'view_movements'],
-  viewer: ['read'],
+  admin: ["read", "write", "delete", "manage_users", "view_reports"],
+  operator: ["read", "write", "view_movements"],
+  viewer: ["read"],
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -38,16 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          await loadUserProfile(session.user);
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await loadUserProfile(session.user);
+      } else {
+        setUser(null);
       }
-    );
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -55,14 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loadUserProfile = async (authUser: User) => {
     try {
       const { data: profile } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', authUser.id)
+        .from("users")
+        .select("*")
+        .eq("id", authUser.id)
         .single();
 
       setUser({ ...authUser, profile: profile || undefined });
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      console.error("Error loading user profile:", error);
       setUser(authUser);
     }
   };
@@ -86,13 +86,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      signIn,
-      signOut,
-      loading,
-      hasPermission,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        signIn,
+        signOut,
+        loading,
+        hasPermission,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -101,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

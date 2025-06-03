@@ -1,11 +1,10 @@
-
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, Snackbar } from "@mui/material";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface OfflineContextType {
+  addPendingOperation: (operation: any) => void;
   isOnline: boolean;
   pendingOperations: any[];
-  addPendingOperation: (operation: any) => void;
   syncData: () => Promise<void>;
 }
 
@@ -15,42 +14,48 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingOperations, setPendingOperations] = useState<any[]>([]);
   const [snackbar, setSnackbar] = useState<{
-    open: boolean;
     message: string;
-    severity: 'success' | 'warning' | 'error';
+    open: boolean;
+    severity: "success" | "warning" | "error";
   }>({
     open: false,
-    message: '',
-    severity: 'success',
+    message: "",
+    severity: "success",
   });
 
-  const showSnackbar = (message: string, severity: 'success' | 'warning' | 'error') => {
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "warning" | "error",
+  ) => {
     setSnackbar({ open: true, message, severity });
   };
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      showSnackbar('Conexión restaurada. Sincronizando datos...', 'success');
+      showSnackbar("Conexión restaurada. Sincronizando datos...", "success");
       syncData();
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      showSnackbar('Sin conexión. Trabajando en modo offline', 'warning');
+      showSnackbar("Sin conexión. Trabajando en modo offline", "warning");
     };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
   const addPendingOperation = (operation: any) => {
-    setPendingOperations(prev => [...prev, { ...operation, timestamp: Date.now() }]);
+    setPendingOperations((prev) => [
+      ...prev,
+      { ...operation, timestamp: Date.now() },
+    ]);
   };
 
   const syncData = async () => {
@@ -58,16 +63,16 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Simulate sync process
-      console.log('Syncing pending operations:', pendingOperations);
-      
+      console.log("Syncing pending operations:", pendingOperations);
+
       // Here you would sync with Supabase
       // await supabase.from('table').insert(pendingOperations);
-      
+
       setPendingOperations([]);
-      showSnackbar('Datos sincronizados correctamente', 'success');
+      showSnackbar("Datos sincronizados correctamente", "success");
     } catch (error) {
-      console.error('Error syncing data:', error);
-      showSnackbar('Error al sincronizar datos', 'error');
+      console.error("Error syncing data:", error);
+      showSnackbar("Error al sincronizar datos", "error");
     }
   };
 
@@ -82,15 +87,15 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
     <OfflineContext.Provider value={contextValue}>
       {children}
       <Snackbar
-        open={snackbar.open}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         autoHideDuration={4000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={snackbar.open}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       >
         <Alert
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
           severity={snackbar.severity}
           variant="filled"
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         >
           {snackbar.message}
         </Alert>
@@ -102,7 +107,7 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
 export function useOffline() {
   const context = useContext(OfflineContext);
   if (context === undefined) {
-    throw new Error('useOffline must be used within an OfflineProvider');
+    throw new Error("useOffline must be used within an OfflineProvider");
   }
   return context;
 }

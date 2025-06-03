@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Inventory as InventoryIcon,
+} from "@mui/icons-material";
 import {
   Box,
   Typography,
@@ -9,7 +13,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Chip,
   Stack,
   TextField,
@@ -26,68 +29,69 @@ import {
   Grid,
   Alert,
   LinearProgress,
-} from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Inventory as InventoryIcon } from '@mui/icons-material';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext';
+} from "@mui/material";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { useAuth } from "../contexts/AuthContext";
 
 interface Material {
+  currentStock: number;
   id: string;
+  location: string;
+  minStock: number;
   name: string;
   type: string;
   unit: string;
-  currentStock: number;
-  minStock: number;
-  location: string;
 }
 
 const mockMaterials: Material[] = [
   {
-    id: '1',
-    name: 'Arena Fina',
-    type: 'Arena',
-    unit: 'm³',
+    id: "1",
+    name: "Arena Fina",
+    type: "Arena",
+    unit: "m³",
     currentStock: 150,
     minStock: 50,
-    location: 'Depósito A',
+    location: "Depósito A",
   },
   {
-    id: '2',
-    name: 'Grava 12mm',
-    type: 'Grava',
-    unit: 'm³',
+    id: "2",
+    name: "Grava 12mm",
+    type: "Grava",
+    unit: "m³",
     currentStock: 30,
     minStock: 40,
-    location: 'Depósito B',
+    location: "Depósito B",
   },
   {
-    id: '3',
-    name: 'Piedra Triturada',
-    type: 'Piedra',
-    unit: 'm³',
+    id: "3",
+    name: "Piedra Triturada",
+    type: "Piedra",
+    unit: "m³",
     currentStock: 200,
     minStock: 75,
-    location: 'Cantera',
+    location: "Cantera",
   },
 ];
 
 export function MaterialsPage() {
   const [materials, setMaterials] = useState<Material[]>(mockMaterials);
-  const [filter, setFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+  const [filter, setFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [open, setOpen] = useState(false);
   const { hasPermission } = useAuth();
 
   const {
-    register,
+    formState: { errors },
     handleSubmit,
+    register,
     reset,
     setValue,
-    formState: { errors },
   } = useForm<Material>();
 
-  if (!hasPermission('read')) {
+  if (!hasPermission("read")) {
     return (
       <Box>
         <Alert severity="error">
@@ -97,20 +101,21 @@ export function MaterialsPage() {
     );
   }
 
-  const filteredMaterials = materials.filter(material =>
-    (material.name.toLowerCase().includes(filter.toLowerCase()) ||
-    material.type.toLowerCase().includes(filter.toLowerCase())) &&
-    (typeFilter === '' || material.type === typeFilter)
+  const filteredMaterials = materials.filter(
+    (material) =>
+      (material.name.toLowerCase().includes(filter.toLowerCase()) ||
+        material.type.toLowerCase().includes(filter.toLowerCase())) &&
+      (typeFilter === "" || material.type === typeFilter),
   );
 
   const handleEdit = (material: Material) => {
     setEditingMaterial(material);
-    setValue('name', material.name);
-    setValue('type', material.type);
-    setValue('unit', material.unit);
-    setValue('currentStock', material.currentStock);
-    setValue('minStock', material.minStock);
-    setValue('location', material.location);
+    setValue("name", material.name);
+    setValue("type", material.type);
+    setValue("unit", material.unit);
+    setValue("currentStock", material.currentStock);
+    setValue("minStock", material.minStock);
+    setValue("location", material.location);
     setOpen(true);
   };
 
@@ -122,12 +127,14 @@ export function MaterialsPage() {
 
   const onSubmit = (data: Material) => {
     if (editingMaterial) {
-      setMaterials(prev => prev.map(m => 
-        m.id === editingMaterial.id ? { ...data, id: editingMaterial.id } : m
-      ));
+      setMaterials((prev) =>
+        prev.map((m) =>
+          m.id === editingMaterial.id ? { ...data, id: editingMaterial.id } : m,
+        ),
+      );
     } else {
       const newMaterial = { ...data, id: Date.now().toString() };
-      setMaterials(prev => [...prev, newMaterial]);
+      setMaterials((prev) => [...prev, newMaterial]);
     }
     setOpen(false);
     reset();
@@ -135,48 +142,63 @@ export function MaterialsPage() {
 
   const getStockStatus = (current: number, min: number) => {
     const percentage = (current / min) * 100;
-    if (percentage < 100) return { color: 'error', label: 'Stock Bajo' };
-    if (percentage < 150) return { color: 'warning', label: 'Stock Medio' };
-    return { color: 'success', label: 'Stock Alto' };
+    if (percentage < 100) return { color: "error", label: "Stock Bajo" };
+    if (percentage < 150) return { color: "warning", label: "Stock Medio" };
+    return { color: "success", label: "Stock Alto" };
   };
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+      <Stack
+        alignItems="center"
+        direction="row"
+        justifyContent="space-between"
+        sx={{ mb: 3 }}
+      >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+          <Typography
+            sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}
+            variant="h4"
+          >
             Gestión de Materiales
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography color="text.secondary" variant="body1">
             Control de inventario y stock de materiales
           </Typography>
         </Box>
         <Button
-          variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleAdd}
           sx={{ borderRadius: 2 }}
+          variant="contained"
+          onClick={handleAdd}
         >
           Agregar Material
         </Button>
       </Stack>
 
-      <Card sx={{ mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Card
+        sx={{
+          mb: 3,
+          borderRadius: 3,
+          border: "1px solid",
+          borderColor: "divider",
+        }}
+      >
         <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <InventoryIcon sx={{ color: 'text.secondary' }} />
+          <Stack alignItems="center" direction="row" spacing={2}>
+            <InventoryIcon sx={{ color: "text.secondary" }} />
             <TextField
               placeholder="Buscar materiales..."
+              size="small"
+              sx={{ minWidth: 300 }}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              sx={{ minWidth: 300 }}
-              size="small"
             />
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Filtrar por tipo</InputLabel>
               <Select
-                value={typeFilter}
                 label="Filtrar por tipo"
+                value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
               >
                 <MenuItem value="">Todos</MenuItem>
@@ -191,7 +213,9 @@ export function MaterialsPage() {
         </CardContent>
       </Card>
 
-      <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Card
+        sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider" }}
+      >
         <TableContainer>
           <Table>
             <TableHead>
@@ -207,36 +231,46 @@ export function MaterialsPage() {
             </TableHead>
             <TableBody>
               {filteredMaterials.map((material) => {
-                const stockStatus = getStockStatus(material.currentStock, material.minStock);
-                const stockPercentage = Math.min((material.currentStock / material.minStock) * 100, 100);
+                const stockStatus = getStockStatus(
+                  material.currentStock,
+                  material.minStock,
+                );
+                const stockPercentage = Math.min(
+                  (material.currentStock / material.minStock) * 100,
+                  100,
+                );
 
                 return (
                   <TableRow key={material.id} hover>
-                    <TableCell sx={{ fontWeight: 500 }}>{material.name}</TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      {material.name}
+                    </TableCell>
                     <TableCell>{material.type}</TableCell>
                     <TableCell>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        <Typography sx={{ fontWeight: 500 }} variant="body2">
                           {material.currentStock} {material.unit}
                         </Typography>
                         <LinearProgress
-                          variant="determinate"
-                          value={stockPercentage}
                           color={stockStatus.color as any}
-                          sx={{ 
-                            height: 4, 
-                            borderRadius: 2, 
+                          value={stockPercentage}
+                          variant="determinate"
+                          sx={{
+                            height: 4,
+                            borderRadius: 2,
                             mt: 0.5,
-                            bgcolor: 'grey.200'
+                            bgcolor: "grey.200",
                           }}
                         />
                       </Box>
                     </TableCell>
-                    <TableCell>{material.minStock} {material.unit}</TableCell>
                     <TableCell>
-                      <Chip 
-                        color={stockStatus.color as any} 
-                        label={stockStatus.label} 
+                      {material.minStock} {material.unit}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        color={stockStatus.color as any}
+                        label={stockStatus.label}
                         size="small"
                         sx={{ borderRadius: 2 }}
                       />
@@ -260,28 +294,33 @@ export function MaterialsPage() {
       </Card>
 
       {/* Dialog for Add/Edit Material */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <DialogTitle>
-          {editingMaterial ? 'Editar Material' : 'Agregar Material'}
+          {editingMaterial ? "Editar Material" : "Agregar Material"}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
-                  {...register('name', { required: 'Nombre requerido' })}
-                  label="Nombre"
+                  {...register("name", { required: "Nombre requerido" })}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  label="Nombre"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.type}>
                   <InputLabel>Tipo</InputLabel>
                   <Select
-                    {...register('type', { required: 'Tipo requerido' })}
+                    {...register("type", { required: "Tipo requerido" })}
                     label="Tipo"
                   >
                     <MenuItem value="Arena">Arena</MenuItem>
@@ -293,11 +332,11 @@ export function MaterialsPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.unit}>
                   <InputLabel>Unidad</InputLabel>
                   <Select
-                    {...register('unit', { required: 'Unidad requerida' })}
+                    {...register("unit", { required: "Unidad requerida" })}
                     label="Unidad"
                   >
                     <MenuItem value="m³">Metros cúbicos</MenuItem>
@@ -307,52 +346,50 @@ export function MaterialsPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  {...register('currentStock', { 
-                    required: 'Stock actual requerido',
-                    min: { value: 0, message: 'Debe ser mayor a 0' }
+                  {...register("currentStock", {
+                    required: "Stock actual requerido",
+                    min: { value: 0, message: "Debe ser mayor a 0" },
                   })}
-                  label="Stock Actual"
-                  type="number"
                   fullWidth
                   error={!!errors.currentStock}
                   helperText={errors.currentStock?.message}
+                  label="Stock Actual"
+                  type="number"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  {...register('minStock', { 
-                    required: 'Stock mínimo requerido',
-                    min: { value: 0, message: 'Debe ser mayor a 0' }
+                  {...register("minStock", {
+                    required: "Stock mínimo requerido",
+                    min: { value: 0, message: "Debe ser mayor a 0" },
                   })}
-                  label="Stock Mínimo"
-                  type="number"
                   fullWidth
                   error={!!errors.minStock}
                   helperText={errors.minStock?.message}
+                  label="Stock Mínimo"
+                  type="number"
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
-                  {...register('location', { required: 'Ubicación requerida' })}
-                  label="Ubicación"
+                  {...register("location", { required: "Ubicación requerida" })}
                   fullWidth
                   error={!!errors.location}
                   helperText={errors.location?.message}
+                  label="Ubicación"
                 />
               </Grid>
             </Grid>
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
+            <Button onClick={() => setOpen(false)}>Cancelar</Button>
             <Button type="submit" variant="contained">
-              {editingMaterial ? 'Actualizar' : 'Agregar'}
+              {editingMaterial ? "Actualizar" : "Agregar"}
             </Button>
           </DialogActions>
         </form>

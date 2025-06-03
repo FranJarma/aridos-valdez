@@ -1,5 +1,11 @@
-
-import React from 'react';
+import {
+  Dashboard as DashboardIcon,
+  Inventory as InventoryIcon,
+  Build as MachineryIcon,
+  SwapHoriz as MovementsIcon,
+  People as PeopleIcon,
+  Analytics as AnalyticsIcon,
+} from "@mui/icons-material";
 import {
   List,
   ListItem,
@@ -11,63 +17,57 @@ import {
   Typography,
   Tooltip,
   Divider,
-} from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Dashboard as DashboardIcon,
-  Inventory as InventoryIcon,
-  Build as MachineryIcon,
-  SwapHoriz as MovementsIcon,
-  People as PeopleIcon,
-  Analytics as AnalyticsIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
+} from "@mui/material";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { useAuth } from "../contexts/AuthContext";
 
 interface SidebarProps {
-  onItemClick?: () => void;
   collapsed?: boolean;
+  onItemClick?: () => void;
 }
 
 const menuItems = [
   {
-    label: 'Dashboard',
-    path: '/dashboard',
+    label: "Dashboard",
+    path: "/dashboard",
     icon: DashboardIcon,
     permission: null,
   },
   {
-    label: 'Materiales',
-    path: '/materials',
+    label: "Materiales",
+    path: "/materials",
     icon: InventoryIcon,
-    permission: 'read',
+    permission: "read",
   },
   {
-    label: 'Maquinaria',
-    path: '/machinery',
+    label: "Maquinaria",
+    path: "/machinery",
     icon: MachineryIcon,
-    permission: 'read',
+    permission: "read",
   },
   {
-    label: 'Movimientos',
-    path: '/movements',
+    label: "Movimientos",
+    path: "/movements",
     icon: MovementsIcon,
-    permission: 'read',
+    permission: "read",
   },
   {
-    label: 'Usuarios',
-    path: '/users',
+    label: "Usuarios",
+    path: "/users",
     icon: PeopleIcon,
-    permission: 'manage_users',
+    permission: "manage_users",
   },
   {
-    label: 'Reportes',
-    path: '/reports',
+    label: "Reportes",
+    path: "/reports",
     icon: AnalyticsIcon,
-    permission: 'read',
+    permission: "read",
   },
 ];
 
-export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
+export function Sidebar({ collapsed = false, onItemClick }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasPermission, user } = useAuth();
@@ -88,31 +88,31 @@ export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
     const button = (
       <ListItemButton
         selected={isActive}
-        onClick={() => handleNavigation(item.path)}
         sx={{
           minHeight: 48,
-          justifyContent: collapsed ? 'center' : 'initial',
+          justifyContent: collapsed ? "center" : "initial",
           px: 2.5,
           borderRadius: 2,
           mx: 1,
           mb: 0.5,
-          '&.Mui-selected': {
-            backgroundColor: 'primary.main',
-            color: 'primary.contrastText',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
+          "&.Mui-selected": {
+            backgroundColor: "primary.main",
+            color: "primary.contrastText",
+            "&:hover": {
+              backgroundColor: "primary.dark",
             },
-            '& .MuiListItemIcon-root': {
-              color: 'primary.contrastText',
+            "& .MuiListItemIcon-root": {
+              color: "primary.contrastText",
             },
           },
         }}
+        onClick={() => handleNavigation(item.path)}
       >
         <ListItemIcon
           sx={{
             minWidth: 0,
             mr: collapsed ? 0 : 3,
-            justifyContent: 'center',
+            justifyContent: "center",
           }}
         >
           <IconComponent />
@@ -123,10 +123,8 @@ export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
 
     if (collapsed) {
       return (
-        <Tooltip key={item.path} title={item.label} placement="right">
-          <ListItem disablePadding>
-            {button}
-          </ListItem>
+        <Tooltip key={item.path} placement="right" title={item.label}>
+          <ListItem disablePadding>{button}</ListItem>
         </Tooltip>
       );
     }
@@ -139,98 +137,112 @@ export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
   };
 
   return (
-    <Box sx={{ 
-      height: '100%', 
-      display: 'flex', 
-      flexDirection: 'column',
-      bgcolor: 'background.paper'
-    }}>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.paper",
+      }}
+    >
       {/* Logo Header */}
-      <Box sx={{ 
-        height: 64, 
-        display: 'flex', 
-        alignItems: 'center',
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        px: collapsed ? 1 : 2,
-        borderBottom: '1px solid',
-        borderColor: 'divider'
-      }}>
-        <img 
-          src="/attached_assets/aridos-valdez-logo.webp" 
+      <Box
+        sx={{
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "flex-start",
+          px: collapsed ? 1 : 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <img
           alt="Áridos Valdez Logo"
-          style={{ 
+          src="/aridos-valdez-logo.webp"
+          style={{
             height: collapsed ? 32 : 40,
-            width: 'auto',
-            objectFit: 'contain'
+            width: "auto",
+            objectFit: "contain",
           }}
         />
       </Box>
 
       {/* Navigation Items */}
       <Box sx={{ flex: 1, pt: 2 }}>
-        <List disablePadding>
-          {menuItems.map(renderMenuItem)}
-        </List>
+        <List disablePadding>{menuItems.map(renderMenuItem)}</List>
       </Box>
 
       {/* User Section at Bottom */}
-      <Box sx={{ mt: 'auto', p: 2 }}>
+      <Box sx={{ mt: "auto", p: 2 }}>
         <Divider sx={{ mb: 2 }} />
-        
+
         {/* User Info */}
         {!collapsed && (
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            p: 1.5,
-            bgcolor: 'grey.50',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'divider'
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              p: 1.5,
+              bgcolor: "grey.50",
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
             <Avatar
-              sx={{ 
-                width: 32, 
-                height: 32, 
-                bgcolor: 'primary.main',
-                fontSize: '0.875rem',
-                mr: 1.5
+              sx={{
+                width: 32,
+                height: 32,
+                bgcolor: "primary.main",
+                fontSize: "0.875rem",
+                mr: 1.5,
               }}
             >
-              {(user?.profile?.name || user?.email || 'U').charAt(0).toUpperCase()}
+              {(user?.profile?.name || user?.email || "U")
+                .charAt(0)
+                .toUpperCase()}
             </Avatar>
             <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              <Typography
+                sx={{ fontWeight: 600, color: "text.primary" }}
+                variant="body2"
+              >
                 Bienvenido:
               </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: 'text.secondary',
-                  display: 'block',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
-                {user?.profile?.name || user?.email || 'Usuario'}
+                {user?.profile?.name || user?.email || "Usuario"}
               </Typography>
             </Box>
           </Box>
         )}
 
         {collapsed && (
-          <Tooltip title={`Bienvenido: ${user?.profile?.name || user?.email || 'Usuario'}`} placement="right">
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Tooltip
+            placement="right"
+            title={`Bienvenido: ${user?.profile?.name || user?.email || "Usuario"}`}
+          >
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Avatar
-                sx={{ 
-                  width: 32, 
-                  height: 32, 
-                  bgcolor: 'primary.main',
-                  fontSize: '0.875rem'
+                sx={{
+                  width: 32,
+                  height: 32,
+                  bgcolor: "primary.main",
+                  fontSize: "0.875rem",
                 }}
               >
-                {(user?.profile?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                {(user?.profile?.name || user?.email || "U")
+                  .charAt(0)
+                  .toUpperCase()}
               </Avatar>
             </Box>
           </Tooltip>

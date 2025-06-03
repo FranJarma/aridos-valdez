@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Build as BuildIcon,
+} from "@mui/icons-material";
 import {
   Box,
   Typography,
@@ -9,7 +13,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Chip,
   Stack,
   TextField,
@@ -25,59 +28,60 @@ import {
   DialogActions,
   Grid,
   Alert,
-} from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Build as BuildIcon } from '@mui/icons-material';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext';
+} from "@mui/material";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { useAuth } from "../contexts/AuthContext";
 
 interface Machinery {
   id: string;
-  name: string;
-  type: string;
-  model: string;
-  status: 'active' | 'maintenance' | 'inactive';
-  location: string;
   lastMaintenance: string;
+  location: string;
+  model: string;
+  name: string;
+  status: "active" | "maintenance" | "inactive";
+  type: string;
 }
 
 const mockMachinery: Machinery[] = [
   {
-    id: '1',
-    name: 'Excavadora CAT 320',
-    type: 'Excavadora',
-    model: 'CAT 320D',
-    status: 'active',
-    location: 'Cantera Norte',
-    lastMaintenance: '2024-01-15',
+    id: "1",
+    name: "Excavadora CAT 320",
+    type: "Excavadora",
+    model: "CAT 320D",
+    status: "active",
+    location: "Cantera Norte",
+    lastMaintenance: "2024-01-15",
   },
   {
-    id: '2',
-    name: 'Cargadora JCB',
-    type: 'Cargadora',
-    model: 'JCB 456',
-    status: 'maintenance',
-    location: 'Taller',
-    lastMaintenance: '2024-01-10',
+    id: "2",
+    name: "Cargadora JCB",
+    type: "Cargadora",
+    model: "JCB 456",
+    status: "maintenance",
+    location: "Taller",
+    lastMaintenance: "2024-01-10",
   },
 ];
 
 export function MachineryPage() {
   const [machinery, setMachinery] = useState<Machinery[]>(mockMachinery);
-  const [filter, setFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [filter, setFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [editingMachine, setEditingMachine] = useState<Machinery | null>(null);
   const [open, setOpen] = useState(false);
   const { hasPermission } = useAuth();
 
   const {
-    register,
+    formState: { errors },
     handleSubmit,
+    register,
     reset,
     setValue,
-    formState: { errors },
   } = useForm<Machinery>();
 
-  if (!hasPermission('read')) {
+  if (!hasPermission("read")) {
     return (
       <Box>
         <Alert severity="error">
@@ -87,19 +91,20 @@ export function MachineryPage() {
     );
   }
 
-  const filteredMachinery = machinery.filter(machine =>
-    (machine.name.toLowerCase().includes(filter.toLowerCase()) ||
-    machine.type.toLowerCase().includes(filter.toLowerCase())) &&
-    (statusFilter === '' || machine.status === statusFilter)
+  const filteredMachinery = machinery.filter(
+    (machine) =>
+      (machine.name.toLowerCase().includes(filter.toLowerCase()) ||
+        machine.type.toLowerCase().includes(filter.toLowerCase())) &&
+      (statusFilter === "" || machine.status === statusFilter),
   );
 
   const handleEdit = (machine: Machinery) => {
     setEditingMachine(machine);
-    setValue('name', machine.name);
-    setValue('type', machine.type);
-    setValue('model', machine.model);
-    setValue('status', machine.status);
-    setValue('location', machine.location);
+    setValue("name", machine.name);
+    setValue("type", machine.type);
+    setValue("model", machine.model);
+    setValue("status", machine.status);
+    setValue("location", machine.location);
     setOpen(true);
   };
 
@@ -111,12 +116,14 @@ export function MachineryPage() {
 
   const onSubmit = (data: Machinery) => {
     if (editingMachine) {
-      setMachinery(prev => prev.map(m => 
-        m.id === editingMachine.id ? { ...data, id: editingMachine.id } : m
-      ));
+      setMachinery((prev) =>
+        prev.map((m) =>
+          m.id === editingMachine.id ? { ...data, id: editingMachine.id } : m,
+        ),
+      );
     } else {
       const newMachine = { ...data, id: Date.now().toString() };
-      setMachinery(prev => [...prev, newMachine]);
+      setMachinery((prev) => [...prev, newMachine]);
     }
     setOpen(false);
     reset();
@@ -124,59 +131,82 @@ export function MachineryPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'maintenance': return 'warning';
-      case 'inactive': return 'error';
-      default: return 'default';
+      case "active":
+        return "success";
+      case "maintenance":
+        return "warning";
+      case "inactive":
+        return "error";
+      default:
+        return "default";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active': return 'Activa';
-      case 'maintenance': return 'Mantenimiento';
-      case 'inactive': return 'Inactiva';
-      default: return 'Desconocido';
+      case "active":
+        return "Activa";
+      case "maintenance":
+        return "Mantenimiento";
+      case "inactive":
+        return "Inactiva";
+      default:
+        return "Desconocido";
     }
   };
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+      <Stack
+        alignItems="center"
+        direction="row"
+        justifyContent="space-between"
+        sx={{ mb: 3 }}
+      >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+          <Typography
+            sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}
+            variant="h4"
+          >
             Gestión de Maquinaria
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography color="text.secondary" variant="body1">
             Control y seguimiento de equipos y maquinaria
           </Typography>
         </Box>
         <Button
-          variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleAdd}
           sx={{ borderRadius: 2 }}
+          variant="contained"
+          onClick={handleAdd}
         >
           Agregar Maquinaria
         </Button>
       </Stack>
 
-      <Card sx={{ mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Card
+        sx={{
+          mb: 3,
+          borderRadius: 3,
+          border: "1px solid",
+          borderColor: "divider",
+        }}
+      >
         <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <BuildIcon sx={{ color: 'text.secondary' }} />
+          <Stack alignItems="center" direction="row" spacing={2}>
+            <BuildIcon sx={{ color: "text.secondary" }} />
             <TextField
               placeholder="Buscar maquinaria..."
+              size="small"
+              sx={{ minWidth: 300 }}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              sx={{ minWidth: 300 }}
-              size="small"
             />
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Filtrar por estado</InputLabel>
               <Select
-                value={statusFilter}
                 label="Filtrar por estado"
+                value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
                 <MenuItem value="">Todos</MenuItem>
@@ -189,7 +219,9 @@ export function MachineryPage() {
         </CardContent>
       </Card>
 
-      <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Card
+        sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider" }}
+      >
         <TableContainer>
           <Table>
             <TableHead>
@@ -199,7 +231,9 @@ export function MachineryPage() {
                 <TableCell sx={{ fontWeight: 600 }}>Modelo</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Estado</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Ubicación</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Último Mantenimiento</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>
+                  Último Mantenimiento
+                </TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -210,9 +244,9 @@ export function MachineryPage() {
                   <TableCell>{machine.type}</TableCell>
                   <TableCell>{machine.model}</TableCell>
                   <TableCell>
-                    <Chip 
-                      color={getStatusColor(machine.status) as any} 
-                      label={getStatusLabel(machine.status)} 
+                    <Chip
+                      color={getStatusColor(machine.status) as any}
+                      label={getStatusLabel(machine.status)}
                       size="small"
                       sx={{ borderRadius: 2 }}
                     />
@@ -236,54 +270,61 @@ export function MachineryPage() {
       </Card>
 
       {/* Dialog for Add/Edit Machinery */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <DialogTitle>
-          {editingMachine ? 'Editar Maquinaria' : 'Agregar Maquinaria'}
+          {editingMachine ? "Editar Maquinaria" : "Agregar Maquinaria"}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
-                  {...register('name', { required: 'Nombre requerido' })}
-                  label="Nombre"
+                  {...register("name", { required: "Nombre requerido" })}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  label="Nombre"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.type}>
                   <InputLabel>Tipo</InputLabel>
                   <Select
-                    {...register('type', { required: 'Tipo requerido' })}
+                    {...register("type", { required: "Tipo requerido" })}
                     label="Tipo"
                   >
                     <MenuItem value="Excavadora">Excavadora</MenuItem>
                     <MenuItem value="Cargadora">Cargadora</MenuItem>
                     <MenuItem value="Volquete">Volquete</MenuItem>
                     <MenuItem value="Trituradora">Trituradora</MenuItem>
-                    <MenuItem value="Cinta transportadora">Cinta transportadora</MenuItem>
+                    <MenuItem value="Cinta transportadora">
+                      Cinta transportadora
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  {...register('model', { required: 'Modelo requerido' })}
-                  label="Modelo"
+                  {...register("model", { required: "Modelo requerido" })}
                   fullWidth
                   error={!!errors.model}
                   helperText={errors.model?.message}
+                  label="Modelo"
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!errors.status}>
                   <InputLabel>Estado</InputLabel>
                   <Select
-                    {...register('status', { required: 'Estado requerido' })}
+                    {...register("status", { required: "Estado requerido" })}
                     label="Estado"
                   >
                     <MenuItem value="active">Activa</MenuItem>
@@ -293,24 +334,22 @@ export function MachineryPage() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  {...register('location', { required: 'Ubicación requerida' })}
-                  label="Ubicación"
+                  {...register("location", { required: "Ubicación requerida" })}
                   fullWidth
                   error={!!errors.location}
                   helperText={errors.location?.message}
+                  label="Ubicación"
                 />
               </Grid>
             </Grid>
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
+            <Button onClick={() => setOpen(false)}>Cancelar</Button>
             <Button type="submit" variant="contained">
-              {editingMachine ? 'Actualizar' : 'Agregar'}
+              {editingMachine ? "Actualizar" : "Agregar"}
             </Button>
           </DialogActions>
         </form>

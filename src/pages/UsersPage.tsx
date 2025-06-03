@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import { Add as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 import {
   Box,
   Typography,
@@ -26,53 +25,54 @@ import {
   DialogActions,
   Grid,
   Alert,
-} from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext';
+} from "@mui/material";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { useAuth } from "../contexts/AuthContext";
 
 interface User {
+  createdAt: string;
+  email: string;
   id: string;
   name: string;
-  email: string;
-  role: 'admin' | 'operator' | 'viewer';
-  createdAt: string;
+  role: "admin" | "operator" | "viewer";
 }
 
 const mockUsers: User[] = [
   {
-    id: '1',
-    name: 'Juan Pérez',
-    email: 'juan.perez@aridosvaldez.com',
-    role: 'admin',
-    createdAt: '2024-01-15',
+    id: "1",
+    name: "Juan Pérez",
+    email: "juan.perez@aridosvaldez.com",
+    role: "admin",
+    createdAt: "2024-01-15",
   },
   {
-    id: '2',
-    name: 'María García',
-    email: 'maria.garcia@aridosvaldez.com',
-    role: 'operator',
-    createdAt: '2024-01-20',
+    id: "2",
+    name: "María García",
+    email: "maria.garcia@aridosvaldez.com",
+    role: "operator",
+    createdAt: "2024-01-20",
   },
 ];
 
 export function UsersPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
-  const [filter, setFilter] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
+  const [filter, setFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
   const { hasPermission } = useAuth();
 
   const {
-    register,
+    formState: { errors },
     handleSubmit,
+    register,
     reset,
     setValue,
-    formState: { errors },
   } = useForm<User>();
 
-  if (!hasPermission('manage_users')) {
+  if (!hasPermission("manage_users")) {
     return (
       <Box>
         <Alert severity="error">
@@ -82,17 +82,18 @@ export function UsersPage() {
     );
   }
 
-  const filteredUsers = users.filter(user =>
-    (user.name.toLowerCase().includes(filter.toLowerCase()) ||
-    user.email.toLowerCase().includes(filter.toLowerCase())) &&
-    (roleFilter === '' || user.role === roleFilter)
+  const filteredUsers = users.filter(
+    (user) =>
+      (user.name.toLowerCase().includes(filter.toLowerCase()) ||
+        user.email.toLowerCase().includes(filter.toLowerCase())) &&
+      (roleFilter === "" || user.role === roleFilter),
   );
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    setValue('name', user.name);
-    setValue('email', user.email);
-    setValue('role', user.role);
+    setValue("name", user.name);
+    setValue("email", user.email);
+    setValue("role", user.role);
     setOpen(true);
   };
 
@@ -104,16 +105,20 @@ export function UsersPage() {
 
   const onSubmit = (data: User) => {
     if (editingUser) {
-      setUsers(prev => prev.map(u => 
-        u.id === editingUser.id ? { ...data, id: editingUser.id, createdAt: editingUser.createdAt } : u
-      ));
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === editingUser.id
+            ? { ...data, id: editingUser.id, createdAt: editingUser.createdAt }
+            : u,
+        ),
+      );
     } else {
-      const newUser = { 
-        ...data, 
+      const newUser = {
+        ...data,
         id: Date.now().toString(),
-        createdAt: new Date().toISOString().split('T')[0]
+        createdAt: new Date().toISOString().split("T")[0],
       };
-      setUsers(prev => [...prev, newUser]);
+      setUsers((prev) => [...prev, newUser]);
     }
     setOpen(false);
     reset();
@@ -121,52 +126,61 @@ export function UsersPage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'secondary';
-      case 'operator': return 'primary';
-      case 'viewer': return 'success';
-      default: return 'default';
+      case "admin":
+        return "secondary";
+      case "operator":
+        return "primary";
+      case "viewer":
+        return "success";
+      default:
+        return "default";
     }
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Administrador';
-      case 'operator': return 'Operador';
-      case 'viewer': return 'Visualizador';
-      default: return 'Desconocido';
+      case "admin":
+        return "Administrador";
+      case "operator":
+        return "Operador";
+      case "viewer":
+        return "Visualizador";
+      default:
+        return "Desconocido";
     }
   };
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" color="primary">
+      <Stack
+        alignItems="center"
+        direction="row"
+        justifyContent="space-between"
+        sx={{ mb: 3 }}
+      >
+        <Typography color="primary" variant="h4">
           Gestión de Usuarios
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAdd}
-        >
+        <Button startIcon={<AddIcon />} variant="contained" onClick={handleAdd}>
           Agregar Usuario
         </Button>
       </Stack>
 
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack alignItems="center" direction="row" spacing={2}>
             <TextField
               placeholder="Buscar usuarios..."
+              size="small"
+              sx={{ minWidth: 300 }}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              sx={{ minWidth: 300 }}
-              size="small"
             />
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel>Filtrar por rol</InputLabel>
               <Select
-                value={roleFilter}
                 label="Filtrar por rol"
+                value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
               >
                 <MenuItem value="">Todos</MenuItem>
@@ -193,13 +207,13 @@ export function UsersPage() {
           <TableBody>
             {filteredUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell sx={{ fontWeight: 'medium' }}>{user.name}</TableCell>
+                <TableCell sx={{ fontWeight: "medium" }}>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Chip 
-                    color={getRoleColor(user.role) as any} 
-                    label={getRoleLabel(user.role)} 
-                    size="small" 
+                  <Chip
+                    color={getRoleColor(user.role) as any}
+                    label={getRoleLabel(user.role)}
+                    size="small"
                   />
                 </TableCell>
                 <TableCell>{user.createdAt}</TableCell>
@@ -219,50 +233,55 @@ export function UsersPage() {
       </TableContainer>
 
       {/* Dialog for Add/Edit User */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <DialogTitle>
-          {editingUser ? 'Editar Usuario' : 'Agregar Usuario'}
+          {editingUser ? "Editar Usuario" : "Agregar Usuario"}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
-                  {...register('name', { required: 'Nombre requerido' })}
-                  label="Nombre Completo"
+                  {...register("name", { required: "Nombre requerido" })}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  label="Nombre Completo"
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
-                  {...register('email', {
-                    required: 'Email requerido',
+                  {...register("email", {
+                    required: "Email requerido",
                     pattern: {
                       value: /^\S+@\S+$/i,
-                      message: 'Email inválido',
+                      message: "Email inválido",
                     },
                   })}
-                  label="Email"
-                  type="email"
                   fullWidth
                   error={!!errors.email}
                   helperText={errors.email?.message}
+                  label="Email"
+                  type="email"
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth error={!!errors.role}>
                   <InputLabel>Rol</InputLabel>
                   <Select
-                    {...register('role', { required: 'Rol requerido' })}
+                    {...register("role", { required: "Rol requerido" })}
                     label="Rol"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
-                      }
+                      },
                     }}
                   >
                     <MenuItem value="admin">Administrador</MenuItem>
@@ -275,11 +294,9 @@ export function UsersPage() {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
+            <Button onClick={() => setOpen(false)}>Cancelar</Button>
             <Button type="submit" variant="contained">
-              {editingUser ? 'Actualizar' : 'Agregar'}
+              {editingUser ? "Actualizar" : "Agregar"}
             </Button>
           </DialogActions>
         </form>
