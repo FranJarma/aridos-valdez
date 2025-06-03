@@ -49,23 +49,31 @@ export function LoginPage() {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Card sx={{ width: '100%', maxWidth: 400 }}>
-          <CardContent sx={{ p: 4 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'background.default',
+        p: 2,
+      }}
+    >
+      <Container component="main" maxWidth="sm">
+        <Card sx={{ 
+          width: '100%', 
+          maxWidth: 420,
+          mx: 'auto',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid',
+          borderColor: 'divider',
+        }}>
+          <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography variant="h4" component="h1" gutterBottom color="primary">
-                Áridos Valdez SRL
+              <Typography variant="h3" component="h1" sx={{ fontWeight: 700, color: 'text.primary', mb: 2 }}>
+                Áridos Valdez
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1rem' }}>
                 Sistema de Gestión de Materiales
               </Typography>
             </Box>
@@ -73,7 +81,17 @@ export function LoginPage() {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={3}>
                 {error && (
-                  <Alert severity="error">{error}</Alert>
+                  <Alert 
+                    severity="error" 
+                    sx={{ 
+                      borderRadius: 2,
+                      border: '1px solid',
+                      borderColor: 'error.light',
+                      bgcolor: 'error.50'
+                    }}
+                  >
+                    {error}
+                  </Alert>
                 )}
 
                 <TextField
@@ -84,11 +102,16 @@ export function LoginPage() {
                       message: 'Email inválido',
                     },
                   })}
-                  label="Email"
+                  label="Correo electrónico"
                   type="email"
                   fullWidth
                   error={!!errors.email}
                   helperText={errors.email?.message}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 48,
+                    }
+                  }}
                 />
 
                 <TextField
@@ -104,6 +127,11 @@ export function LoginPage() {
                   fullWidth
                   error={!!errors.password}
                   helperText={errors.password?.message}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 48,
+                    }
+                  }}
                 />
 
                 <Button
@@ -112,24 +140,39 @@ export function LoginPage() {
                   size="large"
                   fullWidth
                   disabled={loading}
-                  sx={{ mt: 2 }}
+                  sx={{ 
+                    mt: 3,
+                    height: 48,
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                  }}
                 >
                   {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                 </Button>
               </Stack>
             </form>
 
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                Usuario demo: admin@aridosvaldez.com
+            <Box sx={{ 
+              mt: 4, 
+              p: 2, 
+              bgcolor: 'grey.50', 
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider'
+            }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mb: 1 }}>
+                Credenciales de demostración:
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Contraseña: 123456
+              <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                admin@aridosvaldez.com
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                123456
               </Typography>
             </Box>
           </CardContent>
         </Card>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }

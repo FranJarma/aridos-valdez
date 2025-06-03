@@ -50,24 +50,46 @@ export function DashboardPage() {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom color="primary">
-        Dashboard - Planta de Áridos
-      </Typography>
+    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h3" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+          Dashboard
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Resumen general de la planta de áridos
+        </Typography>
+      </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Producción Diaria
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Producción Diaria
+                </Typography>
+                <Box sx={{ 
+                  width: 8, 
+                  height: 8, 
+                  borderRadius: '50%', 
+                  bgcolor: 'success.main',
+                  animation: 'pulse 2s infinite'
+                }} />
+              </Box>
+              <Typography variant="h3" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                1,245
               </Typography>
-              <Typography variant="h4" color="primary">
-                1,245 Ton
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Toneladas
               </Typography>
-              <Typography variant="body2" color="success.main">
-                +23.36% ↗
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
+                  +23.36%
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  vs ayer
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
