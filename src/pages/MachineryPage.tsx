@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -25,9 +24,11 @@ import {
   DialogContent,
   DialogActions,
   Grid,
+  Alert,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Build as BuildIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Machinery {
   id: string;
@@ -36,6 +37,7 @@ interface Machinery {
   model: string;
   status: 'active' | 'maintenance' | 'inactive';
   location: string;
+  lastMaintenance: string;
 }
 
 const mockMachinery: Machinery[] = [
@@ -46,6 +48,7 @@ const mockMachinery: Machinery[] = [
     model: 'CAT 320D',
     status: 'active',
     location: 'Cantera Norte',
+    lastMaintenance: '2024-01-15',
   },
   {
     id: '2',
@@ -54,6 +57,7 @@ const mockMachinery: Machinery[] = [
     model: 'JCB 456',
     status: 'maintenance',
     location: 'Taller',
+    lastMaintenance: '2024-01-10',
   },
 ];
 
@@ -63,6 +67,7 @@ export function MachineryPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [editingMachine, setEditingMachine] = useState<Machinery | null>(null);
   const [open, setOpen] = useState(false);
+  const { hasPermission } = useAuth();
 
   const {
     register,
@@ -71,6 +76,16 @@ export function MachineryPage() {
     setValue,
     formState: { errors },
   } = useForm<Machinery>();
+
+  if (!hasPermission('read')) {
+    return (
+      <Box>
+        <Alert severity="error">
+          No tienes permisos para acceder a esta sección.
+        </Alert>
+      </Box>
+    );
+  }
 
   const filteredMachinery = machinery.filter(machine =>
     (machine.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -128,21 +143,28 @@ export function MachineryPage() {
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" color="primary">
-          Gestión de Maquinaria
-        </Typography>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+            Gestión de Maquinaria
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Control y seguimiento de equipos y maquinaria
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleAdd}
+          sx={{ borderRadius: 2 }}
         >
           Agregar Maquinaria
         </Button>
       </Stack>
 
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
         <CardContent>
           <Stack direction="row" spacing={2} alignItems="center">
+            <BuildIcon sx={{ color: 'text.secondary' }} />
             <TextField
               placeholder="Buscar maquinaria..."
               value={filter}
@@ -167,46 +189,51 @@ export function MachineryPage() {
         </CardContent>
       </Card>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Modelo</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Ubicación</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredMachinery.map((machine) => (
-              <TableRow key={machine.id}>
-                <TableCell sx={{ fontWeight: 'medium' }}>{machine.name}</TableCell>
-                <TableCell>{machine.type}</TableCell>
-                <TableCell>{machine.model}</TableCell>
-                <TableCell>
-                  <Chip 
-                    color={getStatusColor(machine.status) as any} 
-                    label={getStatusLabel(machine.status)} 
-                    size="small" 
-                  />
-                </TableCell>
-                <TableCell>{machine.location}</TableCell>
-                <TableCell>
-                  <Button
-                    size="small"
-                    startIcon={<EditIcon />}
-                    onClick={() => handleEdit(machine)}
-                  >
-                    Editar
-                  </Button>
-                </TableCell>
+      <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600 }}>Nombre</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Tipo</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Modelo</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Estado</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Ubicación</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Último Mantenimiento</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredMachinery.map((machine) => (
+                <TableRow key={machine.id} hover>
+                  <TableCell sx={{ fontWeight: 500 }}>{machine.name}</TableCell>
+                  <TableCell>{machine.type}</TableCell>
+                  <TableCell>{machine.model}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      color={getStatusColor(machine.status) as any} 
+                      label={getStatusLabel(machine.status)} 
+                      size="small"
+                      sx={{ borderRadius: 2 }}
+                    />
+                  </TableCell>
+                  <TableCell>{machine.location}</TableCell>
+                  <TableCell>{machine.lastMaintenance}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleEdit(machine)}
+                    >
+                      Editar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
 
       {/* Dialog for Add/Edit Machinery */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
@@ -288,165 +315,6 @@ export function MachineryPage() {
           </DialogActions>
         </form>
       </Dialog>
-    </Box>
-  );
-}
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-  Stack,
-  TextField,
-  Card,
-  CardContent,
-  Alert,
-} from '@mui/material';
-import { Add as AddIcon, Build as BuildIcon } from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
-
-interface Machinery {
-  id: string;
-  name: string;
-  type: string;
-  status: 'active' | 'maintenance' | 'inactive';
-  location: string;
-  lastMaintenance: string;
-}
-
-const mockMachinery: Machinery[] = [
-  {
-    id: '1',
-    name: 'Excavadora CAT 320',
-    type: 'Excavadora',
-    status: 'active',
-    location: 'Cantera Norte',
-    lastMaintenance: '2024-01-15',
-  },
-  {
-    id: '2',
-    name: 'Volquete Mercedes 2644',
-    type: 'Volquete',
-    status: 'maintenance',
-    location: 'Taller',
-    lastMaintenance: '2024-01-10',
-  },
-];
-
-export function MachineryPage() {
-  const [machinery, setMachinery] = useState<Machinery[]>(mockMachinery);
-  const [filter, setFilter] = useState('');
-  const { hasPermission } = useAuth();
-
-  if (!hasPermission('read')) {
-    return (
-      <Box>
-        <Alert severity="error">
-          No tienes permisos para acceder a esta sección.
-        </Alert>
-      </Box>
-    );
-  }
-
-  const filteredMachinery = machinery.filter(item =>
-    item.name.toLowerCase().includes(filter.toLowerCase()) ||
-    item.type.toLowerCase().includes(filter.toLowerCase())
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'maintenance': return 'warning';
-      case 'inactive': return 'error';
-      default: return 'default';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active': return 'Activo';
-      case 'maintenance': return 'Mantenimiento';
-      case 'inactive': return 'Inactivo';
-      default: return 'Desconocido';
-    }
-  };
-
-  return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
-            Gestión de Maquinaria
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Control y seguimiento de equipos y maquinaria
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{ borderRadius: 2 }}
-        >
-          Agregar Máquina
-        </Button>
-      </Stack>
-
-      <Card sx={{ mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-        <CardContent>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <BuildIcon sx={{ color: 'text.secondary' }} />
-            <TextField
-              placeholder="Buscar maquinaria..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              sx={{ minWidth: 300 }}
-              size="small"
-            />
-          </Stack>
-        </CardContent>
-      </Card>
-
-      <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>Nombre</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Tipo</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Estado</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Ubicación</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Último Mantenimiento</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredMachinery.map((machine) => (
-                <TableRow key={machine.id} hover>
-                  <TableCell sx={{ fontWeight: 500 }}>{machine.name}</TableCell>
-                  <TableCell>{machine.type}</TableCell>
-                  <TableCell>
-                    <Chip 
-                      color={getStatusColor(machine.status) as any} 
-                      label={getStatusLabel(machine.status)} 
-                      size="small"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  </TableCell>
-                  <TableCell>{machine.location}</TableCell>
-                  <TableCell>{machine.lastMaintenance}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
     </Box>
   );
 }

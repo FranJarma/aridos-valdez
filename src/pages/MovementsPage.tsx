@@ -259,7 +259,7 @@ export function MovementsPage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item size xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <FormControl fullWidth error={!!errors.type}>
                   <InputLabel>Tipo de Movimiento</InputLabel>
                   <Select
