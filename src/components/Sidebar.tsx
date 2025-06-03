@@ -145,6 +145,27 @@ export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
       flexDirection: 'column',
       bgcolor: 'background.paper'
     }}>
+      {/* Logo Header */}
+      <Box sx={{ 
+        height: 64, 
+        display: 'flex', 
+        alignItems: 'center',
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        px: collapsed ? 1 : 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider'
+      }}>
+        <img 
+          src="/attached_assets/aridos-valdez-logo.webp" 
+          alt="Áridos Valdez Logo"
+          style={{ 
+            height: collapsed ? 32 : 40,
+            width: 'auto',
+            objectFit: 'contain'
+          }}
+        />
+      </Box>
+
       {/* Navigation Items */}
       <Box sx={{ flex: 1, pt: 2 }}>
         <List disablePadding>
@@ -156,23 +177,6 @@ export function Sidebar({ onItemClick, collapsed = false }: SidebarProps) {
       <Box sx={{ mt: 'auto', p: 2 }}>
         <Divider sx={{ mb: 2 }} />
         
-        {/* Logo */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: collapsed ? 'center' : 'flex-start',
-          mb: 2 
-        }}>
-          <img 
-            src="/attached_assets/aridos-valdez-logo.webp" 
-            alt="Áridos Valdez Logo"
-            style={{ 
-              height: collapsed ? 32 : 40,
-              width: 'auto',
-              objectFit: 'contain'
-            }}
-          />
-        </Box>
-
         {/* User Info */}
         {!collapsed && (
           <Box sx={{ 
