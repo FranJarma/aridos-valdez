@@ -25,7 +25,6 @@ export function SidebarItems({
   onItemClick,
   useTooltip = true,
 }: SidebarItemsProps) {
-  console.log({ isDesktopCollapsed });
   const itemsList = useMemo(() => {
     return items.map((item) => {
       const isActive = locationPathname === item.path;

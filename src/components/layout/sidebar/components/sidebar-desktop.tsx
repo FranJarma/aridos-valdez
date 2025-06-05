@@ -11,6 +11,7 @@ import {
 import { SidebarItems } from "./sidebar-items";
 import type { SidebarItemProps } from "../types/sidebar.types";
 import { Logo } from "@/components/ui/logo/logo";
+import { LogoutButton } from "@/components/ui/logout/logout";
 
 type SidebarDesktopProps = {
   avatarInitial: string;
@@ -43,9 +44,8 @@ export function SidebarDesktop({
         display: { xs: "none", md: "block" },
         "& .MuiDrawer-paper": {
           boxSizing: "border-box",
+          overflow: "hidden",
           width: desktopSidebarWidth,
-          borderRight: "1px solid",
-          borderColor: "divider",
           transition: theme.transitions.create("width", {
             easing: theme.transitions.easing.easeOut,
             duration: 200,
@@ -69,6 +69,7 @@ export function SidebarDesktop({
           locationPathname={locationPathname}
           onItemClick={handleNavigation}
         />
+        <LogoutButton isCollapsed={isDesktopCollapsed} />
 
         <Box sx={{ mt: "auto", p: 2 }}>
           <Divider sx={{ mb: 2 }} />

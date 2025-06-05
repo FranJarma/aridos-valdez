@@ -30,12 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initSession = async () => {
       const session = await supabase.auth.getSession();
-      if (session.data.session?.user) {
-        await loadUserProfile(session.data.session?.user as User);
-        setLoading(false);
+      const authUser = session.data.session?.user;
+
+      if (authUser) {
+        await loadUserProfile(authUser);
       } else {
         setUser(null);
       }
+
+      setLoading(false);
     };
 
     initSession();
@@ -61,12 +64,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      throw error;
+    } else {
+      window.location.href = "/dashboard";
+    }
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      throw error;
+    } else {
+      window.location.href = "/";
+    }
   };
 
   const hasPermissions = (permissions: string[]): boolean => {

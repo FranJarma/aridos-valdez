@@ -51,7 +51,7 @@ export const menuItems: SidebarItemProps[] = [
 export const SIDEBAR_CONSTANTS = {
   WIDTH: {
     COLLAPSED: 72, // px
-    EXPANDED: 240, // px
+    EXPANDED: 280, // px
   },
   TOOLTIP: {
     CLOSE_SIDEBAR: "Cerrar barra lateral",
