@@ -33,7 +33,7 @@ import {
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Material {
   currentStock: number;
@@ -81,7 +81,7 @@ export function MaterialsPage() {
   const [typeFilter, setTypeFilter] = useState("");
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [open, setOpen] = useState(false);
-  const { hasPermission } = useAuth();
+  const { hasPermissions } = useAuth();
 
   const {
     formState: { errors },
@@ -91,7 +91,7 @@ export function MaterialsPage() {
     setValue,
   } = useForm<Material>();
 
-  if (!hasPermission("read")) {
+  if (!hasPermissions(["read"])) {
     return (
       <Box>
         <Alert severity="error">

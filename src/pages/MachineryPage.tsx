@@ -32,7 +32,7 @@ import {
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Machinery {
   id: string;
@@ -71,7 +71,7 @@ export function MachineryPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [editingMachine, setEditingMachine] = useState<Machinery | null>(null);
   const [open, setOpen] = useState(false);
-  const { hasPermission } = useAuth();
+  const { hasPermissions } = useAuth();
 
   const {
     formState: { errors },
@@ -81,7 +81,7 @@ export function MachineryPage() {
     setValue,
   } = useForm<Machinery>();
 
-  if (!hasPermission("read")) {
+  if (!hasPermissions(["read"])) {
     return (
       <Box>
         <Alert severity="error">

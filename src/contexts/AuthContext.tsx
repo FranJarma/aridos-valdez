@@ -1,14 +1,14 @@
 import type { User } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { supabase, type Database } from "../lib/supabase";
+import { supabase, type Database } from "@/lib/supabase";
 
-interface AuthUser extends User {
+export interface AuthUser extends User {
   profile?: Database["public"]["Tables"]["users"]["Row"];
 }
 
 interface AuthContextType {
-  hasPermission: (permission: string) => boolean;
+  hasPermissions: (permission: string[]) => boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -69,9 +69,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const hasPermission = (permission: string): boolean => {
+  const hasPermissions = (permissions: string[]): boolean => {
     if (!user?.profile?.role) return false;
-    return rolePermissions[user.profile.role]?.includes(permission) || false;
+    const userPerms = rolePermissions[user.profile.role] || [];
+    return permissions.every((perm) => userPerms.includes(perm));
   };
 
   return (
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signOut,
         loading,
-        hasPermission,
+        hasPermissions,
       }}
     >
       {children}

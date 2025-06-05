@@ -29,7 +29,7 @@ import {
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface User {
   createdAt: string;
@@ -62,7 +62,7 @@ export function UsersPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
-  const { hasPermission } = useAuth();
+  const { hasPermissions } = useAuth();
 
   const {
     formState: { errors },
@@ -72,7 +72,7 @@ export function UsersPage() {
     setValue,
   } = useForm<User>();
 
-  if (!hasPermission("manage_users")) {
+  if (!hasPermissions(["manage_users"])) {
     return (
       <Box>
         <Alert severity="error">

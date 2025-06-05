@@ -87,7 +87,7 @@ export function MovementsPage() {
     (movement) =>
       (movement.materialName.toLowerCase().includes(filter.toLowerCase()) ||
         movement.type.includes(filter.toLowerCase())) &&
-      (typeFilter === "" || movement.type === typeFilter)
+      (typeFilter === "" || movement.type === typeFilter),
   );
 
   const onSubmit = (data: Movement) => {

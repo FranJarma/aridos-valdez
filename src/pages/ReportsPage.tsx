@@ -27,7 +27,7 @@ import {
   Cell,
 } from "recharts";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const productionData = [
   { month: "Ene", production: 2400, target: 2200 },
@@ -54,9 +54,9 @@ const machineryEfficiency = [
 
 export function ReportsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState("month");
-  const { hasPermission } = useAuth();
+  const { hasPermissions } = useAuth();
 
-  if (!hasPermission("view_reports")) {
+  if (!hasPermissions(["view_reports"])) {
     return (
       <Box>
         <Alert severity="error">
@@ -97,7 +97,7 @@ export function ReportsPage() {
 
       {/* KPI Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid md={3} size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom color="text.secondary">
@@ -113,7 +113,7 @@ export function ReportsPage() {
           </Card>
         </Grid>
 
-        <Grid md={3} size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom color="text.secondary">
@@ -129,7 +129,7 @@ export function ReportsPage() {
           </Card>
         </Grid>
 
-        <Grid md={3} size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom color="text.secondary">
@@ -145,7 +145,7 @@ export function ReportsPage() {
           </Card>
         </Grid>
 
-        <Grid md={3} size={{ xs: 12, sm: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom color="text.secondary">
@@ -164,7 +164,7 @@ export function ReportsPage() {
 
       {/* Charts */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid lg={8} size={{ xs: 12 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom variant="h6">
@@ -190,7 +190,7 @@ export function ReportsPage() {
           </Card>
         </Grid>
 
-        <Grid lg={4} size={{ xs: 12 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Card>
             <CardContent>
               <Typography gutterBottom variant="h6">
