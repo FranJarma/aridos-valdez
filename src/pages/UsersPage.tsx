@@ -43,14 +43,14 @@ const mockUsers: User[] = [
   {
     id: "1",
     name: "Juan Pérez",
-    email: "juan.perez@fidelix.com",
+    email: "juan.perez@aridosvaldez.com",
     role: "admin",
     createdAt: "2024-01-15",
   },
   {
     id: "2",
     name: "María García",
-    email: "maria.garcia@fidelix.com",
+    email: "maria.garcia@aridosvaldez.com",
     role: "operator",
     createdAt: "2024-01-20",
   },
@@ -86,7 +86,7 @@ export function UsersPage() {
     (user) =>
       (user.name.toLowerCase().includes(filter.toLowerCase()) ||
         user.email.toLowerCase().includes(filter.toLowerCase())) &&
-      (roleFilter === "" || user.role === roleFilter),
+      (roleFilter === "" || user.role === roleFilter)
   );
 
   const handleEdit = (user: User) => {
@@ -109,8 +109,8 @@ export function UsersPage() {
         prev.map((u) =>
           u.id === editingUser.id
             ? { ...data, id: editingUser.id, createdAt: editingUser.createdAt }
-            : u,
-        ),
+            : u
+        )
       );
     } else {
       const newUser = {

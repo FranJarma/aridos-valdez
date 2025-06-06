@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
 
-const LOGO_ALT = "Fidelix Logo";
+const LOGO_ALT = "Áridos Valdez Logo";
 const LOGO_CONTAINER_HEIGHT = 64;
-const LOGO_SRC = "/logo-fidelix.webp";
+const LOGO_SRC = "/aridos-valdez-logo.webp";
 const LOGO_TRANSITION = "all 200ms ease-out";
 
 type LogoProps = {

@@ -12,7 +12,7 @@ type LinkProps = {
 export function Link({ children, href, openInNewTab }: LinkProps) {
   const target = openInNewTab ? "_blank" : "_self";
   return (
-    <a style={{ textDecoration: "none" }} href={href} target={target}>
+    <a href={href} target={target}>
       {children}
     </a>
   );
