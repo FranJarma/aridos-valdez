@@ -10,6 +10,7 @@ import {
 
 import { SidebarItems } from "./sidebar-items";
 import type { SidebarItemProps } from "../types/sidebar.types";
+
 import { Logo } from "@/components/ui/logo/logo";
 import { LogoutButton } from "@/components/ui/logout/logout";
 
@@ -61,7 +62,7 @@ export function SidebarDesktop({
           bgcolor: "background.paper",
         }}
       >
-        <Logo isCentered={isDesktopCollapsed} collapsed={isDesktopCollapsed} />
+        <Logo collapsed={isDesktopCollapsed} isCentered={isDesktopCollapsed} />
 
         <SidebarItems
           isDesktopCollapsed={isDesktopCollapsed}

@@ -1,4 +1,3 @@
-import { useAuth } from "@/contexts";
 import { Logout as LogoutIcon } from "@mui/icons-material";
 import {
   ListItem,
@@ -7,6 +6,8 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
+
+import { useAuth } from "@/contexts";
 
 type LogoutButtonProps = {
   isCollapsed?: boolean;
@@ -24,7 +25,7 @@ export function LogoutButton({
         justifyContent: isCollapsed ? "center" : "initial",
         borderRadius: 2,
         px: 2.5,
-        color: "#FF8000",
+        color: "primary.main",
         "&:hover": {
           bgcolor: "orange.50",
         },
@@ -51,7 +52,7 @@ export function LogoutButton({
   );
 
   return useTooltip && isCollapsed ? (
-    <Tooltip title="Cerrar sesión" placement="right">
+    <Tooltip placement="right" title="Cerrar sesión">
       <ListItem disablePadding>{button}</ListItem>
     </Tooltip>
   ) : (

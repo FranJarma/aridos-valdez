@@ -51,12 +51,23 @@ export function LoginPage() {
   return (
     <Box
       sx={{
+        position: "relative",
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "background.default",
         p: 2,
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          backgroundImage: 'url("/aridos-valdez-bg.webp")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.5,
+          zIndex: -1,
+        },
       }}
     >
       <Container component="main" maxWidth="sm">

@@ -10,12 +10,13 @@ import {
 
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { NotFoundPage } from "./components/shared/not-found";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OfflineProvider } from "./contexts/OfflineContext";
+import { MaterialsPage } from "./features/materials/materials-page";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MachineryPage } from "./pages/MachineryPage";
-import { MaterialsPage } from "./pages/MaterialsPage";
 import { MovementsPage } from "./pages/MovementsPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { UsersPage } from "./pages/UsersPage";
@@ -24,7 +25,7 @@ import { theme } from "./theme";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 3,
     },
   },
@@ -72,6 +73,7 @@ export default function App() {
                             element={<Navigate replace to="/dashboard" />}
                             path="/"
                           />
+                          <Route element={<NotFoundPage />} path="*" />
                         </Routes>
                       </Layout>
                     </ProtectedRoute>

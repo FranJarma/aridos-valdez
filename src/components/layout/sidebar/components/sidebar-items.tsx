@@ -50,7 +50,7 @@ export function SidebarItems({
               justifyContent: "center",
             }}
           >
-            <Icon />
+            <Icon />{" "}
           </ListItemIcon>
           {!isDesktopCollapsed && <ListItemText primary={item.label} />}
         </ListItemButton>

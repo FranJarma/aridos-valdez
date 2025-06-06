@@ -75,7 +75,7 @@ const mockMaterials: Material[] = [
   },
 ];
 
-export function MaterialsPage() {
+export function MaterialsPageDeprecated() {
   const [materials, setMaterials] = useState<Material[]>(mockMaterials);
   const [filter, setFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");

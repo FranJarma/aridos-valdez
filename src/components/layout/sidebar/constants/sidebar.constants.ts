@@ -1,10 +1,11 @@
 import {
+  Analytics as AnalyticsIcon,
+  Build as MachineryIcon,
   Dashboard as DashboardIcon,
   Inventory as InventoryIcon,
-  Build as MachineryIcon,
-  SwapHoriz as MovementsIcon,
   People as PeopleIcon,
-  Analytics as AnalyticsIcon,
+  Settings as SettingsIcon,
+  SwapHoriz as MovementsIcon,
 } from "@mui/icons-material";
 
 import type { SidebarItemProps } from "./../types/sidebar.types";
@@ -44,6 +45,12 @@ export const menuItems: SidebarItemProps[] = [
     label: "Reportes",
     path: "/reportes",
     icon: AnalyticsIcon,
+    permissions: ["read"],
+  },
+  {
+    label: "Mi cuenta",
+    path: "/mi-cuenta",
+    icon: SettingsIcon,
     permissions: ["read"],
   },
 ];
