@@ -3,6 +3,7 @@ import { Box, Drawer, IconButton } from "@mui/material";
 
 import { SidebarItems } from "./sidebar-items";
 import type { SidebarItemProps } from "../types/sidebar.types";
+
 import { LogoutButton } from "@/components/ui/logout/logout";
 
 type SidebarMobileProps = {

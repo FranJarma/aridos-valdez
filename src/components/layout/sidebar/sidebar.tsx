@@ -5,12 +5,12 @@ import { SidebarMobile } from "./components/sidebar-mobile";
 import type { SidebarShapeProps } from "./types/sidebar.types";
 
 type SidebarProps = SidebarShapeProps & {
+  closeMobile: () => void;
   desktopSidebarWidth: number;
   isDesktopCollapsed: boolean;
   isMobileOpen: boolean;
   mobileSidebarWidth: number;
   theme: Theme;
-  closeMobile: () => void;
   toggleMobile: () => void;
 };
 

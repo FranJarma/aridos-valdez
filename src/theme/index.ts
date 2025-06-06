@@ -4,9 +4,9 @@ export const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#2563eb", // Modern blue
-      light: "#3b82f6",
-      dark: "#1d4ed8",
+      main: "#c52a37",
+      light: "#e6505c",
+      dark: "#961f2b",
       contrastText: "#ffffff",
     },
     secondary: {
@@ -202,7 +202,7 @@ export const theme = createTheme({
               borderColor: "#cbd5e1",
             },
             "&.Mui-focused fieldset": {
-              borderColor: "#2563eb",
+              borderColor: "#c52a37",
               borderWidth: 2,
             },
           },
@@ -273,13 +273,10 @@ export const theme = createTheme({
             backgroundColor: "#f8fafc",
           },
           "&.Mui-selected": {
-            backgroundColor: "#2563eb",
-            color: "#ffffff",
-            "&:hover": {
-              backgroundColor: "#1d4ed8",
-            },
+            color: "#c52a37",
+
             "& .MuiListItemIcon-root": {
-              color: "#ffffff",
+              color: "#c52a37",
             },
           },
         },

@@ -1,9 +1,9 @@
+import type { Theme } from "@mui/material";
 import { type NavigateFunction } from "react-router-dom";
 
 import { menuItems } from "../constants/sidebar.constants";
 
 import type { AuthUser } from "@/contexts";
-import type { Theme } from "@mui/material";
 
 function getAvatarInitials(displayName?: string): string {
   return (displayName || "U").charAt(0).toUpperCase();
@@ -26,8 +26,8 @@ type ShapeSidebarData = {
   locationPathname: string;
   mobileSidebarWidth: number;
   navigate: NavigateFunction;
-  toggleMobileSidebar: () => void;
   theme: Theme;
+  toggleMobileSidebar: () => void;
   user: AuthUser | null;
 };
 
@@ -40,8 +40,8 @@ export function shapeSidebarData({
   locationPathname,
   mobileSidebarWidth,
   navigate,
-  toggleMobileSidebar,
   theme,
+  toggleMobileSidebar,
   user,
 }: ShapeSidebarData) {
   const userName = getUsername(user);
@@ -53,7 +53,7 @@ export function shapeSidebarData({
   };
 
   const filteredMenuItems = menuItems.filter(
-    (item) => item.permissions.length === 0 || hasPermissions(item.permissions)
+    (item) => item.permissions.length === 0 || hasPermissions(item.permissions),
   );
 
   return {
