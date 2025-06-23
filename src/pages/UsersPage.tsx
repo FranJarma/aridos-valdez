@@ -43,14 +43,14 @@ const mockUsers: User[] = [
   {
     id: "1",
     name: "Juan Pérez",
-    email: "juan.perez@aridosvaldez.com",
+    email: "juan.perez@fidelix.com",
     role: "admin",
     createdAt: "2024-01-15",
   },
   {
     id: "2",
     name: "María García",
-    email: "maria.garcia@aridosvaldez.com",
+    email: "maria.garcia@fidelix.com",
     role: "operator",
     createdAt: "2024-01-20",
   },

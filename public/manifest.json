@@ -1,7 +1,7 @@
 {
-  "name": "Áridos Valdez SRL - Gestión de Materiales",
-  "short_name": "Áridos Valdez",
-  "description": "Sistema de gestión de materiales y maquinaria para Áridos Valdez SRL",
+  "name": "Fidelix - Sistema de fidelización de clientes para PYMES",
+  "short_name": "Fidelix",
+  "description": "Sistema de fidelización de clientes para PYMES",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#8B4513",
